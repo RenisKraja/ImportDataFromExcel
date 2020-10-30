@@ -1,0 +1,98 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="UTF-8">
+    <title>ImportDataFromExcel</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">
+    @*<link rel="stylesheet" href="~/Content/css/bootstrap.min.css" crossorigin="anonymous">*@
+    <link href="~/Content/css/fileinput.css" media="all" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" crossorigin="anonymous">
+    @*<link rel="stylesheet" href="~/Content/css/all.css" crossorigin="anonymous">*@
+    <link href="~/Content/css/theme.css" media="all" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    @*<script src="~/Content/js/jquery-3.3.1.min.js" crossorigin="anonymous"></script>*@
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    @*<script src="~/Content/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>*@
+    <script src="~/Content/js/piexif.js" type="text/javascript"></script>
+    <script src="~/Content/js/sortable.js" type="text/javascript"></script>
+    <script src="~/Content/js/fileinput.js" type="text/javascript"></script>
+    <script src="~/Content/js/fr.js" type="text/javascript"></script>
+    <script src="~/Content/js/es.js" type="text/javascript"></script>
+    <script src="~/Content/js/themes/fas/theme.js" type="text/javascript"></script>
+    <script src="~/Content/js/themes/explorer-fas/theme.js" type="text/javascript"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function IsExcelFile()
+        {
+            $(document).ready(function ()
+            {
+                $(".kv-fileinput-error").css("display", "block");
+                $('.kv-fileinput-error').append('<button type="button" class="close kv-error-close" aria-label="Close" onclick="removeErrorMessage();"><span aria-hidden="true">×</span></button><ul><li>@Html.Raw(ViewBag.Error)</li></ul>');
+            });
+        }
+
+        function removeErrorMessage()
+        {
+            $(document).ready(function ()
+            {
+                $(".kv-fileinput-error").remove();
+            });
+        }
+    </script>
+
+</head>
+<body>
+    @using (Html.BeginForm("Import", "DataImport", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="outerDiv card">
+            <br />
+
+            <div class="container my-4 mainDiv">
+                <div class="card-header">
+                    Data Import Web API
+                </div>
+                <div class="card-body">
+                    <div class="file-loading">
+                        <input id="file-0a" class="file" type="file" data-theme="fas" name="exelFile" />  @*multiple data-min-file-count="1"*@
+                    </div>
+                    <br />
+                    <br />
+                    <center><button type="submit" class="btn btn-primary btn-lg submitButton" value="Import">Submit</button></center>
+                    <br />
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <script>IsExcelFile();</script>
+                    }
+
+
+
+                    @*<button type="reset" class="btn btn-outline-secondary">Reset</button>*@
+                </div>
+            </div>
+        </div>
+
+        @*<div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Data Import Web API
+                </div>
+                <div class="card-body">
+                    
+                </div>
+            </div>
+
+        </div>*@
+
+    }
+</body>
+</html>

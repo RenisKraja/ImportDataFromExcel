@@ -1,0 +1,31 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Success</title>
+</head>
+<body>
+    <h3>List of Records</h3>
+    <table cellpadding="2" cellspacing="2" border="1">
+        <tr>
+            <th>Gas Tariff ID</th>
+            <th>LDZ ID</th>
+            <th>Usage Band Min</th>
+        </tr>
+        @foreach (var item in ViewBag.ListRecords)
+        {
+            <tr>
+                <td>@item.GasTariffID</td>
+                <td>@item.LDZID</td>
+                <td>@item.UsageBandMin</td>
+            </tr>
+        }
+    </table>
+</body>
+</html>
