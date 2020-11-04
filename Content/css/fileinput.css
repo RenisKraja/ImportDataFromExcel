@@ -586,8 +586,13 @@
     min-height: 0px !important;
 }
 
-.mainDiv{
+.mainDiv {
     width: 50%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 0rem !important;
 }
 
 .kv-preview-thumb {
@@ -602,6 +607,7 @@
     bottom: 0px;
     left: 0px;
     background-image: url("https://images.squarespace-cdn.com/content/v1/53b826fee4b0aeb10aba7d96/1405290057554-MZ2QBJSWVFHLDHFRYJ57/ke17ZwdGBToddI8pDm48kBY-qbJWPsJyl0YWCpcFDbUUqsxRUqqbr1mOJYKfIPR7LoDQ9mXPOjoJoqy81S2I8N_N4V1vUb5AoIIIbLZhVYy7Mythp_T-mtop-vrsUOmeInPi9iDjx9w8K4ZfjXt2drFc4DJDfZCKOzhUjt1ZvzpGZRspCr0OR63EIejbUx4HCjLISwBs8eEdxAxTptZAUg/Cloud_background_light_blue_3+copy.png?format=2500w");
+    /*background-image: url("~/../../../Content/bg2.jpg");*/
     height: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -614,6 +620,7 @@
     background-color: white;
     border-bottom-left-radius: 50px !important;
     border-bottom-right-radius: 50px !important;
+    min-height: 486px;
 }
 
 .card-header {

@@ -157,8 +157,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\bg1.jpg" />
+    <Content Include="Content\bg2.jpg" />
     <Content Include="Content\css\all.css" />
     <Content Include="Content\css\bootstrap.min.css" />
+    <Content Include="Content\error.png" />
+    <Content Include="Content\ImportDataFromExcelFavicon.ico" />
     <Content Include="Content\js\bootstrap.bundle.min.js" />
     <Content Include="Content\js\es.js" />
     <Content Include="Content\css\fileinput-rtl.css" />
@@ -173,7 +177,7 @@
     <Content Include="Content\css\theme.css" />
     <Content Include="Content\js\themes\explorer-fas\theme.js" />
     <Content Include="Content\js\themes\fas\theme.js" />
-    <Content Include="favicon.ico" />
+    <Content Include="Content\success.png" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\bootstrap.js" />

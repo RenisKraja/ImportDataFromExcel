@@ -59,7 +59,6 @@ C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csproj.CopyComplete
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.dll
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.pdb
-C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csprojAssemblyReference.cache
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\csi.exe.config
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\Microsoft.Managed.Core.targets
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\Microsoft.Win32.Primitives.dll
@@ -83,3 +82,4 @@ C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\System.Xml.XmlDocument.dll
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\System.Xml.XPath.dll
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\System.Xml.XPath.XDocument.dll
+C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csprojAssemblyReference.cache

@@ -67,7 +67,8 @@ namespace ImportDataFromExcel.Controllers
             ServiceUrl = (string)obj["instance_url"];
 
             //CreateAccount(Client);
-            GetAccount();
+            //GetAccount();
+            //CreateNewGasTariffs(Client);
 
             if ((exelFile == null) || (exelFile.ContentLength == 0))
             {
@@ -90,7 +91,7 @@ namespace ImportDataFromExcel.Controllers
                     List<Record> listRecords = new List<Record>();
                     for (int row = 2; row <= range.Rows.Count; row++)
                     {
-                        CreateObjectType1(Client, range, row);
+                        //CreateObjectType1(Client, range, row);
                         Record item = new Record();
                         //if (range.Cells[row, 11].Value2 != null)
                         if ((Excel.Range)range.Cells[row, 1] != null)
@@ -176,8 +177,8 @@ namespace ImportDataFromExcel.Controllers
 
         public void GetAccount()
         {
-            string companyName = "Test123";
-            string queryMessage = $"SELECT Id, Name, Phone, Type FROM Account WHERE Name = '{companyName}'";
+            string name = "a0ba000000GdKld";
+            string queryMessage = $"SELECT Id, Name, Tariff_Display_Name__c FROM Gas_Tariff__c WHERE Id = '{name}'";
 
             JObject obj = JObject.Parse(QueryRecord(Client, queryMessage));
 
@@ -209,5 +210,54 @@ namespace ImportDataFromExcel.Controllers
             return response.Content.ReadAsStringAsync().Result;
         }
 
+
+
+
+
+
+        public void CreateNewGasTariffs(HttpClient client)
+        {
+            string companyName = "Test123";
+            string owner = GetUserId("UTDS Optimal Choice");
+
+            string createMessage =
+                $"<root>" +
+                    $"<Tariff_Display_Name__c>{companyName}</Tariff_Display_Name__c>" +
+                    $"<Tariff_Name__c>{companyName}</Tariff_Name__c>" +
+                    $"<TariffActualDuration__c>{1}</TariffActualDuration__c>" +
+                    $"<OwnerId>{owner}</OwnerId>" +
+                $"</root>";
+
+            string result = CreateRecord(client, createMessage, "Gas_Tariff__c");
+
+            XDocument doc = XDocument.Parse(result);
+
+            string id = ((XElement)doc.Root.FirstNode).Value;
+            string success = ((XElement)doc.Root.LastNode).Value;
+        }
+
+        public string GetUserId(string name)
+        {
+            string queryMessage = $"SELECT Id, Name FROM User WHERE Name = '{name}'";
+
+            JObject obj = JObject.Parse(QueryRecord(Client, queryMessage));
+
+            if ((string)obj["totalSize"] == "1")
+            {
+                // Only one record, use it
+                return (string)obj["records"][0]["Id"];
+                //string accountPhone = (string)obj["records"][0]["Phone"];
+            }
+            if ((string)obj["totalSize"] == "0")
+            {
+                // No record, create an Account
+            }
+            else
+            {
+                // Multiple records, either filter further to determine correct Account or choose the first result
+            }
+
+            return "";
+        }
     }
 }
