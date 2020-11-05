@@ -82,7 +82,6 @@ C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\System.Xml.XmlDocument.dll
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\System.Xml.XPath.dll
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\bin\roslyn\System.Xml.XPath.XDocument.dll
-C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csprojAssemblyReference.cache
 C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\bin\ImportDataFromExcel.dll.config
 C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\bin\ImportDataFromExcel.dll
 C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\bin\ImportDataFromExcel.pdb
