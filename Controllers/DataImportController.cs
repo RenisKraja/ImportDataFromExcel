@@ -30,6 +30,12 @@ namespace ImportDataFromExcel.Controllers
         public const string ApiEndpoint = "/services/data/v36.0/";//"/services/data/00D030000008aiM/";
         public string AuthToken = "";
         public string ServiceUrl = "";
+        private string Status = "";
+        private string Object = "";
+        private int RecordCreated = 0;
+        private int RecordFailed = 0;
+        private DateTime StartDate = DateTime.UtcNow;
+        private double ProcessingTime = 0.0;
 
         static HttpClient Client;
 
@@ -70,6 +76,32 @@ namespace ImportDataFromExcel.Controllers
             //GetAccount();
             //CreateNewGasTariffs(Client);
 
+            /*
+             //Electricity_Tariff_Price__c
+             1 Electricity Tariff ID = Electricity_Tariff__c
+             2 PES Area ID = PES_Area__c
+             3 Profile Class = Profile_Code__c
+             4 Tariff Type = Tariff_Type__c
+             5 Usage Band Min = Usage_Band_Min__c
+             6 Usage Band Max = Usage_Band_Max__c
+             7 Earliest Contract Start Date = EarliestContractStartDate__c
+             8 Latest Contract Start Date = LatestContractStartDate__c
+             9 Daily Standing Charge = Standing_Charge__c
+             10 Monthly Standing Charge = StandingChargeMonthly__c
+             11 Quarterly Standing Charge = StandingChargeQuarterly__c
+             12 Daily Standing Charge AMR = StandingChargeAMR__c
+             13 Monthly Standing Charge AMR = StandingChargeMonthlyAMR__c
+             14 Quarterly Standing Charge AMR = StandingChargeQuarterlyAMR__c
+             15 Unit Rate = Unit_Rate__c
+             16 Night Unit Rate = Night_Rate__c
+             17 Evening Weekend Unit Rate = Weekend_Rate__c
+             18 FIT Charge = FiTCharge__c
+             19 Pricing Start = Pricing_Start__c
+             20 Pricing End = Pricing_End__c
+            */
+
+            StartDate = DateTime.UtcNow;
+
             if ((exelFile == null) || (exelFile.ContentLength == 0))
             {
                 ViewBag.Error = "Please select an excel file!";
@@ -88,23 +120,27 @@ namespace ImportDataFromExcel.Controllers
                     Excel.Workbook workBook = application.Workbooks.Open(path);
                     Excel.Worksheet workSheet = workBook.ActiveSheet;
                     Excel.Range range = workSheet.UsedRange;
-                    List<Record> listRecords = new List<Record>();
+                    //List<Record> listRecords = new List<Record>();
+
+                    Object = "Electricity_Tariff_Price__c";
+
                     for (int row = 2; row <= range.Rows.Count; row++)
                     {
+                        CreateNewElectricityTariff(Client, range, row);
                         //CreateObjectType1(Client, range, row);
-                        Record item = new Record();
-                        //if (range.Cells[row, 11].Value2 != null)
-                        if ((Excel.Range)range.Cells[row, 1] != null)
-                            item.GasTariffID = ((Excel.Range)range.Cells[row, 1]).Text;
-                        if ((Excel.Range)range.Cells[row, 2] != null)
-                            item.LDZID = ((Excel.Range)range.Cells[row, 2]).Text;
-                        if ((Excel.Range)range.Cells[row, 3] != null)
-                            item.UsageBandMin = int.Parse(((Excel.Range)range.Cells[row, 3]).Text);
+                        //Record item = new Record();
+                        ////if (range.Cells[row, 11].Value2 != null)
+                        //if ((Excel.Range)range.Cells[row, 1] != null)
+                        //    item.GasTariffID = ((Excel.Range)range.Cells[row, 1]).Text;
+                        //if ((Excel.Range)range.Cells[row, 2] != null)
+                        //    item.LDZID = ((Excel.Range)range.Cells[row, 2]).Text;
+                        //if ((Excel.Range)range.Cells[row, 3] != null)
+                        //    item.UsageBandMin = int.Parse(((Excel.Range)range.Cells[row, 3]).Text);
 
-                        listRecords.Add(item);
+                        //listRecords.Add(item);
                     }
 
-                    ViewBag.ListRecords = listRecords;
+                    //ViewBag.ListRecords = listRecords;
 
 
                     workBook.Close(true, null, null);
@@ -113,6 +149,21 @@ namespace ImportDataFromExcel.Controllers
                     Marshal.ReleaseComObject(workSheet);
                     Marshal.ReleaseComObject(workBook);
                     Marshal.ReleaseComObject(application);
+
+                    ProcessingTime = (StartDate - DateTime.UtcNow).TotalSeconds;
+                    Status = "Completed";
+
+                    Results results = new Results();
+                    results.Status = Status;
+                    results.Object = Object;
+                    results.RecordCreated = RecordCreated.ToString();
+                    results.RecordFailed = RecordFailed.ToString();
+                    results.StartDate = StartDate.ToString();
+                    results.ProcessingTime = ProcessingTime.ToString();
+
+
+                    ViewBag.Results = results;
+
 
                     return View("Success");
                 }
@@ -161,20 +212,6 @@ namespace ImportDataFromExcel.Controllers
             string success = ((XElement)doc.Root.LastNode).Value;
         }
 
-        private string CreateRecord(HttpClient client, string createMessage, string recordType)
-        {
-            HttpContent contentCreate = new StringContent(createMessage, Encoding.UTF8, "application/xml");
-            string uri = $"{ServiceUrl}{ApiEndpoint}sobjects/{recordType}";
-
-            HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
-            requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
-            requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-            requestCreate.Content = contentCreate;
-
-            HttpResponseMessage response = client.SendAsync(requestCreate).Result;
-            return response.Content.ReadAsStringAsync().Result;
-        }
-
         public void GetAccount()
         {
             string name = "a0ba000000GdKld";
@@ -209,11 +246,6 @@ namespace ImportDataFromExcel.Controllers
             HttpResponseMessage response = client.SendAsync(request).Result;
             return response.Content.ReadAsStringAsync().Result;
         }
-
-
-
-
-
 
         public void CreateNewGasTariffs(HttpClient client)
         {
@@ -258,6 +290,79 @@ namespace ImportDataFromExcel.Controllers
             }
 
             return "";
+        }
+
+        public void CreateNewElectricityTariff(HttpClient client, Excel.Range range, int row)
+        {
+            string createMessage = $"<root>";
+
+            if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                createMessage += $"<Electricity_Tariff__c>{ ((Excel.Range)range.Cells[row, 1]).Text }</Electricity_Tariff__c>";
+            if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
+                createMessage += $"<PES_Area__c>{ ((Excel.Range)range.Cells[row, 2]).Text }</PES_Area__c>";
+            if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                createMessage += $"<Profile_Code__c>{ ((Excel.Range)range.Cells[row, 3]).Text }</Profile_Code__c>";
+            if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                createMessage += $"<Tariff_Type__c>{ ((Excel.Range)range.Cells[row, 4]).Text }</Tariff_Type__c>";
+            if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                createMessage += $"<Usage_Band_Min__c>{ ((Excel.Range)range.Cells[row, 5]).Text }</Usage_Band_Min__c>";
+            if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                createMessage += $"<Usage_Band_Max__c>{ ((Excel.Range)range.Cells[row, 6]).Text }</Usage_Band_Max__c>";
+            if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
+                createMessage += $"<EarliestContractStartDate__c>{ ((Excel.Range)range.Cells[row, 7]).Text }</EarliestContractStartDate__c>";
+            if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                createMessage += $"<LatestContractStartDate__c>{ ((Excel.Range)range.Cells[row, 8]).Text }</LatestContractStartDate__c>";
+            if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                createMessage += $"<Standing_Charge__c>{ ((Excel.Range)range.Cells[row, 9]).Text }</Standing_Charge__c>";
+            if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
+                createMessage += $"<StandingChargeMonthly__c>{ ((Excel.Range)range.Cells[row, 10]).Text }</StandingChargeMonthly__c>";
+            if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
+                createMessage += $"<StandingChargeQuarterly__c>{ ((Excel.Range)range.Cells[row, 11]).Text }</StandingChargeQuarterly__c>";
+            if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
+                createMessage += $"<StandingChargeAMR__c>{ ((Excel.Range)range.Cells[row, 12]).Text }</StandingChargeAMR__c>";
+            if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
+                createMessage += $"<StandingChargeMonthlyAMR__c>{ ((Excel.Range)range.Cells[row, 13]).Text }</StandingChargeMonthlyAMR__c>";
+            if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
+                createMessage += $"<StandingChargeQuarterlyAMR__c>{ ((Excel.Range)range.Cells[row, 14]).Text }</StandingChargeQuarterlyAMR__c>";
+            if (((Excel.Range)range.Cells[row, 15] != null) && (((Excel.Range)range.Cells[row, 15]).Text != string.Empty))
+                createMessage += $"<Unit_Rate__c>{ ((Excel.Range)range.Cells[row, 15]).Text }</Unit_Rate__c>";
+            if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
+                createMessage += $"<Night_Rate__c>{ ((Excel.Range)range.Cells[row, 16]).Text }</Night_Rate__c>";
+            if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
+                createMessage += $"<Weekend_Rate__c>{ ((Excel.Range)range.Cells[row, 17]).Text }</Weekend_Rate__c>";
+            if (((Excel.Range)range.Cells[row, 18] != null) && (((Excel.Range)range.Cells[row, 18]).Text != string.Empty))
+                createMessage += $"<FiTCharge__c>{ ((Excel.Range)range.Cells[row, 18]).Text }</FiTCharge__c>";
+            if (((Excel.Range)range.Cells[row, 19] != null) && (((Excel.Range)range.Cells[row, 19]).Text != string.Empty))
+                createMessage += $"<Pricing_Start__c>{ ((Excel.Range)range.Cells[row, 19]).Text }</Pricing_Start__c>";
+            if (((Excel.Range)range.Cells[row, 20] != null) && (((Excel.Range)range.Cells[row, 20]).Text != string.Empty))
+                createMessage += $"<Pricing_End__c>{ ((Excel.Range)range.Cells[row, 20]).Text }</Pricing_End__c>";
+
+            createMessage += $"</root>";
+
+            string result = CreateRecord(client, createMessage, Object);
+
+            XDocument doc = XDocument.Parse(result);
+
+            string id = ((XElement)doc.Root.FirstNode).Value;
+            string success = ((XElement)doc.Root.LastNode).Value;
+            if (success.Equals("true"))
+                RecordCreated++;
+            else
+                RecordFailed++;
+        }
+
+        private string CreateRecord(HttpClient client, string createMessage, string recordType)
+        {
+            HttpContent contentCreate = new StringContent(createMessage, Encoding.UTF8, "application/xml");
+            string uri = $"{ServiceUrl}{ApiEndpoint}sobjects/{recordType}";
+
+            HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+            requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+            requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            requestCreate.Content = contentCreate;
+
+            HttpResponseMessage response = client.SendAsync(requestCreate).Result;
+            return response.Content.ReadAsStringAsync().Result;
         }
     }
 }
