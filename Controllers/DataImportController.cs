@@ -26,16 +26,22 @@ namespace ImportDataFromExcel.Controllers
         //private string ClientId = "3MVG9c1ghSpUbLl.WS5lVK4WUp7.pJRpX9Stoq_maEArt4yFyRVoHQGlb_pTjebqcgaX6I0iWJY1ch7Mznkqw";
         //private string ClientSecret = "A4A69F3EFF63203E8D1CAE33B3C0A47717ED3950339AC9CE1F159C85B0F993E1";
 
-        public const string LoginEndpoint = "https://test.salesforce.com/services/oauth2/token"; //https://login.salesforce.com/services/oauth2/token
         public const string ApiEndpoint = "/services/data/v36.0/";//"/services/data/00D030000008aiM/";
+        public string LoginEndpoint = "";//"https://test.salesforce.com/services/oauth2/token"; //https://login.salesforce.com/services/oauth2/token
         public string AuthToken = "";
         public string ServiceUrl = "";
+        private Excel.Application application = null;
+        private Excel.Workbook workBook = null;
+        private Excel.Worksheet workSheet = null;
         private string Status = "";
         private string Object = "";
         private int RecordCreated = 0;
         private int RecordFailed = 0;
-        private DateTime StartDate = DateTime.UtcNow;
+        private DateTime StartDate = DateTime.Now;
         private double ProcessingTime = 0.0;
+        private string MessageError = "";
+        private string StatusCode = "";
+        private string ReferenceId = "";
 
         static HttpClient Client;
 
@@ -45,135 +51,362 @@ namespace ImportDataFromExcel.Controllers
         }
 
         [HttpPost]
-        public ActionResult Import(HttpPostedFileBase exelFile)
+        public ActionResult Import(HttpPostedFileBase excelFile, FormCollection form)
         {
-            string Username = WebConfigurationManager.AppSettings["Username"];
-            string Password = WebConfigurationManager.AppSettings["Password"];
-            string ClientId = WebConfigurationManager.AppSettings["ClientId"];
-            string ClientSecret = WebConfigurationManager.AppSettings["ClientSecret"];
-
-            Client = new HttpClient();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
-
-            HttpContent content = new FormUrlEncodedContent(new Dictionary<string, string>
+            try
             {
-                {"grant_type", "password"},
-                {"client_id", ClientId},
-                {"client_secret", ClientSecret},
-                {"username", Username},
-                {"password", Password}
-            });
+                LoginEndpoint = WebConfigurationManager.AppSettings["LoginEndpoint"];
+                string Username = WebConfigurationManager.AppSettings["Username"];
+                string Password = WebConfigurationManager.AppSettings["Password"];
+                string ClientId = WebConfigurationManager.AppSettings["ClientId"];
+                string ClientSecret = WebConfigurationManager.AppSettings["ClientSecret"];
 
-            HttpResponseMessage message = Client.PostAsync(LoginEndpoint, content).Result;
+                Client = new HttpClient();
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
 
-            string response = message.Content.ReadAsStringAsync().Result;
-            JObject obj = JObject.Parse(response);
-
-            AuthToken = (string)obj["access_token"];
-            ServiceUrl = (string)obj["instance_url"];
-
-            //CreateAccount(Client);
-            //GetAccount();
-            //CreateNewGasTariffs(Client);
-
-            /*
-             //Electricity_Tariff_Price__c
-             1 Electricity Tariff ID = Electricity_Tariff__c
-             2 PES Area ID = PES_Area__c
-             3 Profile Class = Profile_Code__c
-             4 Tariff Type = Tariff_Type__c
-             5 Usage Band Min = Usage_Band_Min__c
-             6 Usage Band Max = Usage_Band_Max__c
-             7 Earliest Contract Start Date = EarliestContractStartDate__c
-             8 Latest Contract Start Date = LatestContractStartDate__c
-             9 Daily Standing Charge = Standing_Charge__c
-             10 Monthly Standing Charge = StandingChargeMonthly__c
-             11 Quarterly Standing Charge = StandingChargeQuarterly__c
-             12 Daily Standing Charge AMR = StandingChargeAMR__c
-             13 Monthly Standing Charge AMR = StandingChargeMonthlyAMR__c
-             14 Quarterly Standing Charge AMR = StandingChargeQuarterlyAMR__c
-             15 Unit Rate = Unit_Rate__c
-             16 Night Unit Rate = Night_Rate__c
-             17 Evening Weekend Unit Rate = Weekend_Rate__c
-             18 FIT Charge = FiTCharge__c
-             19 Pricing Start = Pricing_Start__c
-             20 Pricing End = Pricing_End__c
-            */
-
-            StartDate = DateTime.UtcNow;
-
-            if ((exelFile == null) || (exelFile.ContentLength == 0))
-            {
-                ViewBag.Error = "Please select an excel file!";
-                return View("Index");
-            }
-            else
-            {
-                if ((exelFile.FileName.EndsWith("xls")) || (exelFile.FileName.EndsWith("xlsx")) || (exelFile.FileName.EndsWith("csv")))
+                HttpContent content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    string path = Server.MapPath("~/Content/" + exelFile.FileName);
-                    if (System.IO.File.Exists(path))
-                        System.IO.File.Delete(path);
-                    exelFile.SaveAs(path);
+                    {"grant_type", "password"},
+                    {"client_id", ClientId},
+                    {"client_secret", ClientSecret},
+                    {"username", Username},
+                    {"password", Password}
+                });
 
-                    Excel.Application application = new Excel.Application();
-                    Excel.Workbook workBook = application.Workbooks.Open(path);
-                    Excel.Worksheet workSheet = workBook.ActiveSheet;
-                    Excel.Range range = workSheet.UsedRange;
-                    //List<Record> listRecords = new List<Record>();
+                HttpResponseMessage message = Client.PostAsync(LoginEndpoint, content).Result;
 
-                    Object = "Electricity_Tariff_Price__c";
+                string response = message.Content.ReadAsStringAsync().Result;
+                JObject obj = JObject.Parse(response);
 
-                    for (int row = 2; row <= range.Rows.Count; row++)
-                    {
-                        CreateNewElectricityTariff(Client, range, row);
-                        //CreateObjectType1(Client, range, row);
-                        //Record item = new Record();
-                        ////if (range.Cells[row, 11].Value2 != null)
-                        //if ((Excel.Range)range.Cells[row, 1] != null)
-                        //    item.GasTariffID = ((Excel.Range)range.Cells[row, 1]).Text;
-                        //if ((Excel.Range)range.Cells[row, 2] != null)
-                        //    item.LDZID = ((Excel.Range)range.Cells[row, 2]).Text;
-                        //if ((Excel.Range)range.Cells[row, 3] != null)
-                        //    item.UsageBandMin = int.Parse(((Excel.Range)range.Cells[row, 3]).Text);
+                AuthToken = (string)obj["access_token"];
+                ServiceUrl = (string)obj["instance_url"];
 
-                        //listRecords.Add(item);
-                    }
+                //curl https://yourInstance.salesforce.com/services/data/v34.0/composite/tree/Account/ -H "Authorization: Bearer token -H "Content-Type: application/json" -d "@newrecords.json"
 
-                    //ViewBag.ListRecords = listRecords;
+                //string json = "{";
+                //json += "\"records\" :[{";
+                //json += "    \"attributes\" : {\"type\" : \"Account\", \"referenceId\" : \"Row1\"},";
+                //json += "    \"name\" : \"SampleAccount1\",";
+                //json += "    \"phone\" : \"1111111111\",";
+                //json += "    \"website\" : \"www.salesforce.com\",";
+                //json += "    \"industry\" : \"Banking\"";
+                //json += "    },{";
+                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row2\"},";
+                //json += "    \"name\" : \"SampleAccount2\",";
+                //json += "    \"phone\" : \"2222222222\",";
+                //json += "    \"website\" : \"www.salesforce2.com\",";
+                //json += "    \"industry\" : \"Banking\"";
+                //json += "    },{";
+                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row3\"},";
+                //json += "    \"name\" : \"SampleAccount23\",";
+                //json += "    \"phone\" : \"2222222222\",";
+                //json += "    \"website\" : \"www.salesforce2.com\",";
+                //json += "    \"industry\" : \"Banking\"";
+                //json += "    },{";
+                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row4\"},";
+                //json += "    \"name\" : \"SampleAccount4\",";
+                //json += "    \"phone\" : \"2222222222\",";
+                //json += "    \"website\" : \"www.salesforce2.com\",";
+                //json += "    \"industry\" : \"Banking\"";
+                //json += "    },{";
+                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row5\"},";
+                //json += "    \"name\" : \"SampleAccount5\",";
+                //json += "    \"phone\" : \"2222222222\",";
+                //json += "    \"website\" : \"www.salesforce2.com\",";
+                //json += "    \"industry\" : \"Banking\"";
+                //json += "    }]";
+                //json += "}";
+
+                //Object = form["objectType"].ToString();
+                ////string uri = $"" + ServiceUrl + "/services/data/v36.0/composite/tree/" + Object + "/";
+                //string uri = $"" + ServiceUrl + "/services/data/v36.0/composite/tree/Account/";
+
+                //HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                //requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                //requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                //requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                //HttpResponseMessage response2 = Client.SendAsync(requestCreate).Result;
+                //var temp = response2.Content.ReadAsStringAsync().Result;
 
 
-                    workBook.Close(true, null, null);
-                    application.Quit();
+                //CreateAccount(Client);
+                //GetAccount();
+                //CreateNewGasTariffs(Client);
 
-                    Marshal.ReleaseComObject(workSheet);
-                    Marshal.ReleaseComObject(workBook);
-                    Marshal.ReleaseComObject(application);
+                /*
+                 //Electricity_Tariff_Price__c
+                 1 Electricity Tariff ID = Electricity_Tariff__c
+                 2 PES Area ID = PES_Area__c
+                 3 Profile Class = Profile_Code__c
+                 4 Tariff Type = Tariff_Type__c
+                 5 Usage Band Min = Usage_Band_Min__c
+                 6 Usage Band Max = Usage_Band_Max__c
+                 7 Earliest Contract Start Date = EarliestContractStartDate__c
+                 8 Latest Contract Start Date = LatestContractStartDate__c
+                 9 Daily Standing Charge = Standing_Charge__c
+                 10 Monthly Standing Charge = StandingChargeMonthly__c
+                 11 Quarterly Standing Charge = StandingChargeQuarterly__c
+                 12 Daily Standing Charge AMR = StandingChargeAMR__c
+                 13 Monthly Standing Charge AMR = StandingChargeMonthlyAMR__c
+                 14 Quarterly Standing Charge AMR = StandingChargeQuarterlyAMR__c
+                 15 Unit Rate = Unit_Rate__c
+                 16 Night Unit Rate = Night_Rate__c
+                 17 Evening Weekend Unit Rate = Weekend_Rate__c
+                 18 FIT Charge = FiTCharge__c
+                 19 Pricing Start = Pricing_Start__c
+                 20 Pricing End = Pricing_End__c
+                */
 
-                    ProcessingTime = (StartDate - DateTime.UtcNow).TotalSeconds;
-                    Status = "Completed";
+                StartDate = DateTime.Now;
 
-                    Results results = new Results();
-                    results.Status = Status;
-                    results.Object = Object;
-                    results.RecordCreated = RecordCreated.ToString();
-                    results.RecordFailed = RecordFailed.ToString();
-                    results.StartDate = StartDate.ToString();
-                    results.ProcessingTime = ProcessingTime.ToString();
-
-
-                    ViewBag.Results = results;
-
-
-                    return View("Success");
+                if ((excelFile == null) || (excelFile.ContentLength == 0))
+                {
+                    ViewBag.Error = "Please select an excel file!";
+                    return View("Index");
                 }
                 else
                 {
-                    ViewBag.Error = "File type is incorrect! <br>";
-                    return View("Index");
+                    if ((excelFile.FileName.EndsWith("xls")) || (excelFile.FileName.EndsWith("xlsx")) || (excelFile.FileName.EndsWith("csv")))
+                    {
+                        string path = Server.MapPath("~/Content/" + excelFile.FileName);
+                        if (System.IO.File.Exists(path))
+                            System.IO.File.Delete(path);
+                        excelFile.SaveAs(path);
+
+                        application = new Excel.Application();
+                        workBook = application.Workbooks.Open(path);
+                        workSheet = workBook.ActiveSheet;
+                        Excel.Range range = workSheet.UsedRange;
+
+                        bool isElectricityTariffPrice = true;
+                        Object = form["objectType"].ToString();
+                        if (!Object.Equals("Electricity_Tariff_Price__c"))
+                            isElectricityTariffPrice = false;
+
+                        string uri = $"" + ServiceUrl + "/services/data/v36.0/composite/tree/" + Object + "/";
+
+                        HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                        requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                        requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+
+                        int multipleRecordCreateNo = 0;
+                        HttpResponseMessage responseCreate = null;
+                        XDocument doc = null;
+                        string result = null;
+                        int numberOfRows = range.Rows.Count;
+                        string json = "{";
+                        json += "\"records\" :[";
+
+                        for (int row = 2; row <= 6; row++)
+                        //for (int row = 2; row <= range.Rows.Count; row++)
+                        {
+                            multipleRecordCreateNo++;
+
+                            json += "{";
+                            json += "    \"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
+
+                            if(isElectricityTariffPrice)
+                                json += CreateElectricityTariffPrice(range, row);
+                            else
+                                json += CreateGasTariffPrice(range, row);
+
+                            if (json.Last() == ',')
+                                json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
+
+                            json += "    },";
+
+                            if ((multipleRecordCreateNo == 200) && (row != range.Rows.Count))
+                            {
+                                json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                                json += "    ]";
+                                json += "}";
+
+                                requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                                responseCreate = Client.SendAsync(requestCreate).Result;
+                                result = responseCreate.Content.ReadAsStringAsync().Result;
+
+                                doc = XDocument.Parse(result);
+                                if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                                {
+                                    ImportFailed(doc);
+                                    return View("Error");
+                                }
+
+                                requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                                requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                                requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                                json = "{";
+                                json += "\"records\" :[";
+                                RecordCreated += multipleRecordCreateNo;
+                                multipleRecordCreateNo = 0;
+                            }
+                        }
+
+                        json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                        json += "    ]";
+                        json += "}";
+
+                        requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                        responseCreate = Client.SendAsync(requestCreate).Result;
+                        result = responseCreate.Content.ReadAsStringAsync().Result;
+
+                        doc = XDocument.Parse(result);
+                        if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                        {
+                            ImportFailed(doc);
+                            return View("Error");
+                        }
+
+                        CloseExcelFile();
+
+                        Status = "Completed";
+                        RecordCreated = numberOfRows - 1;
+                        PopulateOutputTable();
+
+                        return View("Success");
+                    }
+                    else
+                    {
+                        ViewBag.Error = "File type is incorrect! <br>";
+                        return View("Index");
+                    }
                 }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
             }
         }
+
+        public string CreateElectricityTariffPrice(Excel.Range range, int row)
+        {
+            string json = "";
+
+            if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                json += "    \"Electricity_Tariff__c\" : \"" + ((Excel.Range)range.Cells[row, 1]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
+                json += "    \"PES_Area__c\" : \"" + ((Excel.Range)range.Cells[row, 2]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                json += "    \"Profile_Code__c\" : \"" + ((Excel.Range)range.Cells[row, 3]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                json += "    \"Tariff_Type__c\" : \"" + ((Excel.Range)range.Cells[row, 4]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                json += "    \"Usage_Band_Min__c\" : \"" + ((Excel.Range)range.Cells[row, 5]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                json += "    \"Usage_Band_Max__c\" : \"" + ((Excel.Range)range.Cells[row, 6]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
+                json += "    \"EarliestContractStartDate__c\" : \"" + ((Excel.Range)range.Cells[row, 7]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                json += "    \"LatestContractStartDate__c\" : \"" + ((Excel.Range)range.Cells[row, 8]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 9]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
+                json += "    \"StandingChargeMonthly__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
+                json += "    \"StandingChargeQuarterly__c\" : \"" + ((Excel.Range)range.Cells[row, 11]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
+                json += "    \"StandingChargeAMR__c\" : \"" + ((Excel.Range)range.Cells[row, 12]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
+                json += "    \"StandingChargeMonthlyAMR__c\" : \"" + ((Excel.Range)range.Cells[row, 13]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
+                json += "    \"StandingChargeQuarterlyAMR__c\" : \"" + ((Excel.Range)range.Cells[row, 14]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 15] != null) && (((Excel.Range)range.Cells[row, 15]).Text != string.Empty))
+                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 15]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
+                json += "    \"Night_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 16]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
+                json += "    \"Weekend_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 17]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 18] != null) && (((Excel.Range)range.Cells[row, 18]).Text != string.Empty))
+                json += "    \"FiTCharge__c\" : \"" + ((Excel.Range)range.Cells[row, 18]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 19] != null) && (((Excel.Range)range.Cells[row, 19]).Text != string.Empty))
+                json += "    \"Pricing_Start__c\" : \"" + ((Excel.Range)range.Cells[row, 19]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 20] != null) && (((Excel.Range)range.Cells[row, 20]).Text != string.Empty))
+                json += "    \"Pricing_End__c\" : \"" + ((Excel.Range)range.Cells[row, 20]).Text + "\"";
+
+            return json;
+        }
+
+        public string CreateGasTariffPrice(Excel.Range range, int row)
+        {
+            string json = "";
+
+            if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                json += "    \"Gas_Tariff__c\" : \"" + ((Excel.Range)range.Cells[row, 1]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
+                json += "    \"PES_Area__c\" : \"" + ((Excel.Range)range.Cells[row, 2]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                json += "    \"Usage_Band_Min__c\" : \"" + ((Excel.Range)range.Cells[row, 3]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                json += "    \"Usage_Band_Max__c\" : \"" + ((Excel.Range)range.Cells[row, 4]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                json += "    \"EarliestContractStartDate__c\" : \"" + ((Excel.Range)range.Cells[row, 5]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                json += "    \"LatestContractStartDate__c\" : \"" + ((Excel.Range)range.Cells[row, 6]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
+                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 7]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                json += "    \"StandingChargeMonthly__c\" : \"" + ((Excel.Range)range.Cells[row, 8]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                json += "    \"StandingChargeQuarterly__c\" : \"" + ((Excel.Range)range.Cells[row, 9]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
+                json += "    \"StandingChargeAMR__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
+                json += "    \"StandingChargeMonthlyAMR__c\" : \"" + ((Excel.Range)range.Cells[row, 11]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
+                json += "    \"StandingChargeQuarterlyAMR__c\" : \"" + ((Excel.Range)range.Cells[row, 12]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
+                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 13]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
+                json += "    \"Pricing_Start__c\" : \"" + ((Excel.Range)range.Cells[row, 14]).Text + "\",";
+            if (((Excel.Range)range.Cells[row, 15] != null) && (((Excel.Range)range.Cells[row, 15]).Text != string.Empty))
+                json += "    \"Pricing_End__c\" : \"" + ((Excel.Range)range.Cells[row, 15]).Text + "\",";
+
+            return json;
+        }
+
+        public void ImportFailed(XDocument doc)
+        {
+            Status = "Failed";
+            RecordFailed = 1;
+            MessageError = doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("results").ElementAt(0).Descendants("errors").ElementAt(0).Descendants("message").ElementAt(0).Value;
+            StatusCode = doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("results").ElementAt(0).Descendants("errors").ElementAt(0).Descendants("statusCode").ElementAt(0).Value;
+            ReferenceId = doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("results").ElementAt(0).Descendants("referenceId").ElementAt(0).Value;
+
+            CloseExcelFile();
+            PopulateOutputTable();
+        }
+
+        public void PopulateOutputTable()
+        {
+            ProcessingTime = (DateTime.Now - StartDate).TotalSeconds;
+
+            Results results = new Results();
+            results.Status = Status;
+            results.Object = Object;
+            results.RecordCreated = RecordCreated.ToString();
+            results.RecordFailed = RecordFailed.ToString();
+            results.StartDate = StartDate.ToString();
+            results.ProcessingTime = (Math.Round(ProcessingTime, 2)).ToString();
+            results.MessageError = MessageError;
+            results.StatusCode = StatusCode;
+            results.ReferenceId = ReferenceId;
+            ViewBag.Results = results;
+        }
+
+        public void CloseExcelFile()
+        {
+            workBook.Close(true, null, null);
+            application.Quit();
+            Marshal.ReleaseComObject(workSheet);
+            Marshal.ReleaseComObject(workBook);
+            Marshal.ReleaseComObject(application);
+        }
+
+
 
         private void CreateAccount(HttpClient client)
         {

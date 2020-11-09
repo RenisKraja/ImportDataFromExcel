@@ -36,11 +36,7 @@
         {
             $(document).ready(function ()
             {
-                //$(".file-drop-zone-title").css("margin-top: -56px !important");
                 $(".kv-fileinput-error").remove();
-                //$(".kv-fileinput-error").css("display", "block");
-                //$(".file-error-messagekv-fileinput-error file-error-message").css("margin-top", " -56px !important;");
-                //style = "margin-top: -56px !important;"
                 $('.file-drop-zone').append('<div class="kv-fileinput-error file-error-message" style = "margin-top: -61px !important;"><button type="button" class="close kv-error-close" aria-label="Close" onclick="removeErrorMessage();"><span aria-hidden="true">×</span></button><ul><li>@Html.Raw(ViewBag.Error)</li></ul></div>');
             });
         }
@@ -68,8 +64,6 @@
 
         $(document).ready(function () {
             $(".submitButton").on("click", function () {
-                //$(".spinner").toggle();
-                //alert("test");
                 $('#overlay').fadeIn();
             });
         });
@@ -77,13 +71,6 @@
 
         $(document).ready(function () {
             $(".submitButton").on("click", function () {
-                //alert("test");
-                //var height = document.getElementsByClassName('card-body').style.height;
-                //var weight = document.getElementsByClassName('card-body').style.weight;
-
-                //document.getElementById('overlay').style.height = "100% !important";
-                //document.getElementById('overlay').style.weight = "100% !important";
-
                 var cardbodyWidth = document.getElementsByClassName("mainDiv")[0].clientWidth;
                 var width = cardbodyWidth - 30;
 
@@ -94,46 +81,7 @@
     </script>
     
     <style type="text/css">
-        #overlay {
-            background: #ffffff;
-            color: #666666;
-            position: fixed;
-            height: 100%;
-            width: 100%;
-            z-index: 5000;
-            top: 0;
-            left: 0;
-            float: left;
-            text-align: center;
-            padding-top: 25%;
-            opacity: .85;
-
-            border-bottom-left-radius: 50px !important;
-            border-bottom-right-radius: 50px !important;
-            border-top-left-radius: 50px !important;
-            border-top-right-radius: 50px !important;
-            margin-left: 15px;
-        }
-
-        .spinner {
-            margin: 0 auto;
-            height: 70px;
-            width: 70px;
-            animation: rotate 0.8s infinite linear;
-            border: 7px solid firebrick;
-            border-right-color: transparent;
-            border-radius: 50%;
-            margin-top: 100px;
-        }
-        @@keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
+        
     </style>
 
 </head>
@@ -148,17 +96,26 @@
                 </div>
                 <div class="card-body">
                     <div class="file-loading">
-                        <input id="file-0a" class="file" type="file" data-theme="fas" name="exelFile" />
+                        <input id="file-0a" class="file" type="file" data-theme="fas" name="excelFile" />
                     </div>
                     <br />
-                    <br />
+                    <center>
+                        <div class="objectType">
+                            <span class="objectType" style="">Select Object Type: </span>
+                            @Html.RadioButton("objectType", "Electricity_Tariff_Price__c", true)
+                            <span class="objectType1" style="">Electricity Tariff Price</span>
+                            @Html.RadioButton("objectType", "Gas_Tariff_Price__c")
+                            <span class="objectType2" style="">Gas Tariff Price</span>
+                        </div>
+                    </center>
+                    <br/>
                     <center><button type="submit" class="btn btn-primary btn-lg submitButton" value="Import">Submit</button></center>
                     <br />
 
                     
                     <div id="overlay"  style="display:none;">
                         <center style="margin-top: -50px !important;">
-                            <div class="spinner"></div><br/><span style=" font-family: revert; font-weight: bold; font-size: 25px; color: black; font-weight: 600;">Loading...</span>
+                            <div class="spinner"></div><br/><span class="loadingSpan" style="">Loading...</span>
                         </center>
                     </div>
 

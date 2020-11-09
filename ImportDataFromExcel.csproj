@@ -213,6 +213,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\DataImport\Index.cshtml" />
     <Content Include="Views\DataImport\Success.cshtml" />
+    <Content Include="Views\DataImport\Error.cshtml" />
     <None Include="Web References\SFDC\apex.wsdl" />
     <Content Include="Web References\SFDC\CompileAndTestResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>

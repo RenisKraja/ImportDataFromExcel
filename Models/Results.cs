@@ -42,5 +42,23 @@ namespace ImportDataFromExcel.Models
             get;
             set;
         }
+
+        public string MessageError
+        {
+            get;
+            set;
+        }
+
+        public string StatusCode
+        {
+            get;
+            set;
+        }
+
+        public string ReferenceId
+        {
+            get;
+            set;
+        }
     }
 }
