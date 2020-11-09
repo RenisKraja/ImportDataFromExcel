@@ -166,4 +166,3 @@ C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\obj\Debug\Impo
 C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\obj\Debug\ImportDataFromExcel.csproj.CopyComplete
 C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\obj\Debug\ImportDataFromExcel.dll
 C:\Users\ledja\OneDrive\Desktop\Table_Responsive_v1\Renis project\obj\Debug\ImportDataFromExcel.pdb
-C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csprojAssemblyReference.cache

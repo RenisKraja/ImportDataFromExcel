@@ -21,11 +21,6 @@ namespace ImportDataFromExcel.Controllers
 {
     public class DataImportController : Controller
     {
-        //private string Username = "marilo@utdsoptimalchoice.com.uat";
-        //private string Password = "Projekti123";
-        //private string ClientId = "3MVG9c1ghSpUbLl.WS5lVK4WUp7.pJRpX9Stoq_maEArt4yFyRVoHQGlb_pTjebqcgaX6I0iWJY1ch7Mznkqw";
-        //private string ClientSecret = "A4A69F3EFF63203E8D1CAE33B3C0A47717ED3950339AC9CE1F159C85B0F993E1";
-
         public const string ApiEndpoint = "/services/data/v36.0/";//"/services/data/00D030000008aiM/";
         public string LoginEndpoint = "";//"https://test.salesforce.com/services/oauth2/token"; //https://login.salesforce.com/services/oauth2/token
         public string AuthToken = "";
@@ -81,83 +76,6 @@ namespace ImportDataFromExcel.Controllers
                 AuthToken = (string)obj["access_token"];
                 ServiceUrl = (string)obj["instance_url"];
 
-                //curl https://yourInstance.salesforce.com/services/data/v34.0/composite/tree/Account/ -H "Authorization: Bearer token -H "Content-Type: application/json" -d "@newrecords.json"
-
-                //string json = "{";
-                //json += "\"records\" :[{";
-                //json += "    \"attributes\" : {\"type\" : \"Account\", \"referenceId\" : \"Row1\"},";
-                //json += "    \"name\" : \"SampleAccount1\",";
-                //json += "    \"phone\" : \"1111111111\",";
-                //json += "    \"website\" : \"www.salesforce.com\",";
-                //json += "    \"industry\" : \"Banking\"";
-                //json += "    },{";
-                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row2\"},";
-                //json += "    \"name\" : \"SampleAccount2\",";
-                //json += "    \"phone\" : \"2222222222\",";
-                //json += "    \"website\" : \"www.salesforce2.com\",";
-                //json += "    \"industry\" : \"Banking\"";
-                //json += "    },{";
-                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row3\"},";
-                //json += "    \"name\" : \"SampleAccount23\",";
-                //json += "    \"phone\" : \"2222222222\",";
-                //json += "    \"website\" : \"www.salesforce2.com\",";
-                //json += "    \"industry\" : \"Banking\"";
-                //json += "    },{";
-                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row4\"},";
-                //json += "    \"name\" : \"SampleAccount4\",";
-                //json += "    \"phone\" : \"2222222222\",";
-                //json += "    \"website\" : \"www.salesforce2.com\",";
-                //json += "    \"industry\" : \"Banking\"";
-                //json += "    },{";
-                //json += "    \"attributes\" : { \"type\" : \"Account\", \"referenceId\" : \"Row5\"},";
-                //json += "    \"name\" : \"SampleAccount5\",";
-                //json += "    \"phone\" : \"2222222222\",";
-                //json += "    \"website\" : \"www.salesforce2.com\",";
-                //json += "    \"industry\" : \"Banking\"";
-                //json += "    }]";
-                //json += "}";
-
-                //Object = form["objectType"].ToString();
-                ////string uri = $"" + ServiceUrl + "/services/data/v36.0/composite/tree/" + Object + "/";
-                //string uri = $"" + ServiceUrl + "/services/data/v36.0/composite/tree/Account/";
-
-                //HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
-                //requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
-                //requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-                //requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                //HttpResponseMessage response2 = Client.SendAsync(requestCreate).Result;
-                //var temp = response2.Content.ReadAsStringAsync().Result;
-
-
-                //CreateAccount(Client);
-                //GetAccount();
-                //CreateNewGasTariffs(Client);
-
-                /*
-                 //Electricity_Tariff_Price__c
-                 1 Electricity Tariff ID = Electricity_Tariff__c
-                 2 PES Area ID = PES_Area__c
-                 3 Profile Class = Profile_Code__c
-                 4 Tariff Type = Tariff_Type__c
-                 5 Usage Band Min = Usage_Band_Min__c
-                 6 Usage Band Max = Usage_Band_Max__c
-                 7 Earliest Contract Start Date = EarliestContractStartDate__c
-                 8 Latest Contract Start Date = LatestContractStartDate__c
-                 9 Daily Standing Charge = Standing_Charge__c
-                 10 Monthly Standing Charge = StandingChargeMonthly__c
-                 11 Quarterly Standing Charge = StandingChargeQuarterly__c
-                 12 Daily Standing Charge AMR = StandingChargeAMR__c
-                 13 Monthly Standing Charge AMR = StandingChargeMonthlyAMR__c
-                 14 Quarterly Standing Charge AMR = StandingChargeQuarterlyAMR__c
-                 15 Unit Rate = Unit_Rate__c
-                 16 Night Unit Rate = Night_Rate__c
-                 17 Evening Weekend Unit Rate = Weekend_Rate__c
-                 18 FIT Charge = FiTCharge__c
-                 19 Pricing Start = Pricing_Start__c
-                 20 Pricing End = Pricing_End__c
-                */
-
                 StartDate = DateTime.Now;
 
                 if ((excelFile == null) || (excelFile.ContentLength == 0))
@@ -198,8 +116,8 @@ namespace ImportDataFromExcel.Controllers
                         string json = "{";
                         json += "\"records\" :[";
 
-                        for (int row = 2; row <= 6; row++)
-                        //for (int row = 2; row <= range.Rows.Count; row++)
+                        //for (int row = 2; row <= 6; row++)
+                        for (int row = 2; row <= range.Rows.Count; row++)
                         {
                             multipleRecordCreateNo++;
 
@@ -277,7 +195,6 @@ namespace ImportDataFromExcel.Controllers
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -404,198 +321,6 @@ namespace ImportDataFromExcel.Controllers
             Marshal.ReleaseComObject(workSheet);
             Marshal.ReleaseComObject(workBook);
             Marshal.ReleaseComObject(application);
-        }
-
-
-
-        private void CreateAccount(HttpClient client)
-        {
-            string companyName = "Test123";
-            string phone = "123-456-7890";
-
-            string createMessage = 
-                $"<root>" +
-                    $"<Name>{companyName}</Name>" +
-                    $"<Phone>{phone}</Phone>" +
-                $"</root>";
-
-            string result = CreateRecord(client, createMessage, "Account");
-
-            XDocument doc = XDocument.Parse(result);
-
-            string id = ((XElement)doc.Root.FirstNode).Value;
-            string success = ((XElement)doc.Root.LastNode).Value;
-        }
-
-        private void CreateObjectType1(HttpClient client, Excel.Range range, int row)
-        {
-
-            string createMessage = $"<root>";
-
-            if ((Excel.Range)range.Cells[row, 1] != null)
-                createMessage += $"<Name>{ ((Excel.Range)range.Cells[row, 1]).Text }</Name>";
-            
-            createMessage += $"</root>";
-
-            string result = CreateRecord(client, createMessage, "Account");
-
-            XDocument doc = XDocument.Parse(result);
-
-            string id = ((XElement)doc.Root.FirstNode).Value;
-            string success = ((XElement)doc.Root.LastNode).Value;
-        }
-
-        public void GetAccount()
-        {
-            string name = "a0ba000000GdKld";
-            string queryMessage = $"SELECT Id, Name, Tariff_Display_Name__c FROM Gas_Tariff__c WHERE Id = '{name}'";
-
-            JObject obj = JObject.Parse(QueryRecord(Client, queryMessage));
-
-            if ((string)obj["totalSize"] == "1")
-            {
-                // Only one record, use it
-                string accountId = (string)obj["records"][0]["Id"];
-                string accountPhone = (string)obj["records"][0]["Phone"];
-            }
-            if ((string)obj["totalSize"] == "0")
-            {
-                // No record, create an Account
-            }
-            else
-            {
-                // Multiple records, either filter further to determine correct Account or choose the first result
-            }
-        }
-
-        private string QueryRecord(HttpClient client, string queryMessage)
-        {
-            string restQuery = $"{ServiceUrl}{ApiEndpoint}query?q={queryMessage}";
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, restQuery);
-            request.Headers.Add("Authorization", "Bearer " + AuthToken);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpResponseMessage response = client.SendAsync(request).Result;
-            return response.Content.ReadAsStringAsync().Result;
-        }
-
-        public void CreateNewGasTariffs(HttpClient client)
-        {
-            string companyName = "Test123";
-            string owner = GetUserId("UTDS Optimal Choice");
-
-            string createMessage =
-                $"<root>" +
-                    $"<Tariff_Display_Name__c>{companyName}</Tariff_Display_Name__c>" +
-                    $"<Tariff_Name__c>{companyName}</Tariff_Name__c>" +
-                    $"<TariffActualDuration__c>{1}</TariffActualDuration__c>" +
-                    $"<OwnerId>{owner}</OwnerId>" +
-                $"</root>";
-
-            string result = CreateRecord(client, createMessage, "Gas_Tariff__c");
-
-            XDocument doc = XDocument.Parse(result);
-
-            string id = ((XElement)doc.Root.FirstNode).Value;
-            string success = ((XElement)doc.Root.LastNode).Value;
-        }
-
-        public string GetUserId(string name)
-        {
-            string queryMessage = $"SELECT Id, Name FROM User WHERE Name = '{name}'";
-
-            JObject obj = JObject.Parse(QueryRecord(Client, queryMessage));
-
-            if ((string)obj["totalSize"] == "1")
-            {
-                // Only one record, use it
-                return (string)obj["records"][0]["Id"];
-                //string accountPhone = (string)obj["records"][0]["Phone"];
-            }
-            if ((string)obj["totalSize"] == "0")
-            {
-                // No record, create an Account
-            }
-            else
-            {
-                // Multiple records, either filter further to determine correct Account or choose the first result
-            }
-
-            return "";
-        }
-
-        public void CreateNewElectricityTariff(HttpClient client, Excel.Range range, int row)
-        {
-            string createMessage = $"<root>";
-
-            if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
-                createMessage += $"<Electricity_Tariff__c>{ ((Excel.Range)range.Cells[row, 1]).Text }</Electricity_Tariff__c>";
-            if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
-                createMessage += $"<PES_Area__c>{ ((Excel.Range)range.Cells[row, 2]).Text }</PES_Area__c>";
-            if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
-                createMessage += $"<Profile_Code__c>{ ((Excel.Range)range.Cells[row, 3]).Text }</Profile_Code__c>";
-            if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
-                createMessage += $"<Tariff_Type__c>{ ((Excel.Range)range.Cells[row, 4]).Text }</Tariff_Type__c>";
-            if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
-                createMessage += $"<Usage_Band_Min__c>{ ((Excel.Range)range.Cells[row, 5]).Text }</Usage_Band_Min__c>";
-            if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
-                createMessage += $"<Usage_Band_Max__c>{ ((Excel.Range)range.Cells[row, 6]).Text }</Usage_Band_Max__c>";
-            if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
-                createMessage += $"<EarliestContractStartDate__c>{ ((Excel.Range)range.Cells[row, 7]).Text }</EarliestContractStartDate__c>";
-            if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
-                createMessage += $"<LatestContractStartDate__c>{ ((Excel.Range)range.Cells[row, 8]).Text }</LatestContractStartDate__c>";
-            if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
-                createMessage += $"<Standing_Charge__c>{ ((Excel.Range)range.Cells[row, 9]).Text }</Standing_Charge__c>";
-            if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
-                createMessage += $"<StandingChargeMonthly__c>{ ((Excel.Range)range.Cells[row, 10]).Text }</StandingChargeMonthly__c>";
-            if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
-                createMessage += $"<StandingChargeQuarterly__c>{ ((Excel.Range)range.Cells[row, 11]).Text }</StandingChargeQuarterly__c>";
-            if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
-                createMessage += $"<StandingChargeAMR__c>{ ((Excel.Range)range.Cells[row, 12]).Text }</StandingChargeAMR__c>";
-            if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
-                createMessage += $"<StandingChargeMonthlyAMR__c>{ ((Excel.Range)range.Cells[row, 13]).Text }</StandingChargeMonthlyAMR__c>";
-            if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
-                createMessage += $"<StandingChargeQuarterlyAMR__c>{ ((Excel.Range)range.Cells[row, 14]).Text }</StandingChargeQuarterlyAMR__c>";
-            if (((Excel.Range)range.Cells[row, 15] != null) && (((Excel.Range)range.Cells[row, 15]).Text != string.Empty))
-                createMessage += $"<Unit_Rate__c>{ ((Excel.Range)range.Cells[row, 15]).Text }</Unit_Rate__c>";
-            if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
-                createMessage += $"<Night_Rate__c>{ ((Excel.Range)range.Cells[row, 16]).Text }</Night_Rate__c>";
-            if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
-                createMessage += $"<Weekend_Rate__c>{ ((Excel.Range)range.Cells[row, 17]).Text }</Weekend_Rate__c>";
-            if (((Excel.Range)range.Cells[row, 18] != null) && (((Excel.Range)range.Cells[row, 18]).Text != string.Empty))
-                createMessage += $"<FiTCharge__c>{ ((Excel.Range)range.Cells[row, 18]).Text }</FiTCharge__c>";
-            if (((Excel.Range)range.Cells[row, 19] != null) && (((Excel.Range)range.Cells[row, 19]).Text != string.Empty))
-                createMessage += $"<Pricing_Start__c>{ ((Excel.Range)range.Cells[row, 19]).Text }</Pricing_Start__c>";
-            if (((Excel.Range)range.Cells[row, 20] != null) && (((Excel.Range)range.Cells[row, 20]).Text != string.Empty))
-                createMessage += $"<Pricing_End__c>{ ((Excel.Range)range.Cells[row, 20]).Text }</Pricing_End__c>";
-
-            createMessage += $"</root>";
-
-            string result = CreateRecord(client, createMessage, Object);
-
-            XDocument doc = XDocument.Parse(result);
-
-            string id = ((XElement)doc.Root.FirstNode).Value;
-            string success = ((XElement)doc.Root.LastNode).Value;
-            if (success.Equals("true"))
-                RecordCreated++;
-            else
-                RecordFailed++;
-        }
-
-        private string CreateRecord(HttpClient client, string createMessage, string recordType)
-        {
-            HttpContent contentCreate = new StringContent(createMessage, Encoding.UTF8, "application/xml");
-            string uri = $"{ServiceUrl}{ApiEndpoint}sobjects/{recordType}";
-
-            HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
-            requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
-            requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-            requestCreate.Content = contentCreate;
-
-            HttpResponseMessage response = client.SendAsync(requestCreate).Result;
-            return response.Content.ReadAsStringAsync().Result;
         }
     }
 }
