@@ -10,18 +10,18 @@
     <meta name="viewport" content="width=device-width" />
     <meta charset="UTF-8">
     <title>ImportDataFromExcel</title>
-    <link rel="icon" href="@Url.Content("~/content/ImportDataFromExcelFavicon.ico")"/>
+    <link rel="icon" href="@Url.Content("~/content/ImportDataFromExcelFavicon.ico")" />
 
-    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">-->
-    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css" crossorigin="anonymous">
-    <link href="~/Content/css/fileinput.css" media="all" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" crossorigin="anonymous">
-    <!-- <link rel="stylesheet" href="~/Content/css/all.css" crossorigin="anonymous"> -->
     <link href="~/Content/css/theme.css" media="all" rel="stylesheet" type="text/css">
     <!--<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>-->
     <script src="~/Content/js/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <!-- <script src="~/Content/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script> -->
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css" crossorigin="anonymous">
+    <link href="~/Content/css/fileinput.css" media="all" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="~/Content/css/all.css" crossorigin="anonymous"> -->
     <script src="~/Content/js/piexif.js" type="text/javascript"></script>
     <script src="~/Content/js/sortable.js" type="text/javascript"></script>
     <script src="~/Content/js/fileinput.js" type="text/javascript"></script>
@@ -79,9 +79,28 @@
         });
 
     </script>
+
     
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function SelectedValue(ddlObject) {
+            var selectedText = ddlObject.options[ddlObject.selectedIndex].innerHTML;
+            var objectType = document.getElementById("objectType");
+
+            if ((selectedText == "SSE") && (objectType.options[objectType.selectedIndex].value == "Electricity_Tariff_Price__c")) {
+                //alert("Selected Text: " + selectedText);
+                $("#SSEModal").modal('show');
+                //$("modal-backdrop").css("position", "unset !important");
+                setTimeout(function () {
+                    $(".modal-backdrop").remove();
+                }, 200);
+            }
+        }
+    </script>
+
     <style type="text/css">
-        
     </style>
 
 </head>
@@ -99,23 +118,130 @@
                         <input id="file-0a" class="file" type="file" data-theme="fas" name="excelFile" />
                     </div>
                     <br />
-                    <center>
-                        <div class="objectType">
-                            <span class="objectType" style="">Select Object Type: </span>
-                            @Html.RadioButton("objectType", "Electricity_Tariff_Price__c", true)
-                            <span class="objectType1" style="">Electricity Tariff Price</span>
-                            @Html.RadioButton("objectType", "Gas_Tariff_Price__c")
-                            <span class="objectType2" style="">Gas Tariff Price</span>
+                    @*<center>
+            <div class="objectType">
+                <span class="objectType" style="">Select Object Type: </span>
+                @Html.RadioButton("objectType", "Electricity_Tariff_Price__c", true)
+                <span class="objectType1" style="">Electricity Tariff Price</span>
+                @Html.RadioButton("objectType", "Gas_Tariff_Price__c")
+                <span class="objectType2" style="">Gas Tariff Price</span>
+            </div>
+        </center>
+        <br/>*@
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-4 col-md-5 col-lg-5">
+                                <span style="padding-left: 10px; font-family: sans-serif; font-size: 18px; line-height: 2; ">Select Supplier:</span>
+                                @Html.DropDownList("suppliers", ViewData["suppliers"] as SelectList, new { @class = "form-control form-control-sm", @onChange = "SelectedValue(this)" })
+                            </div>
+                            <div class="col-sm-4 col-md-4 col-lg-4">
+                                <span style="padding-left: 10px; font-family: sans-serif; font-size: 18px; line-height: 2; ">Select Object Type:</span>
+                                @Html.DropDownList("objectType", ViewData["objectType"] as SelectList, new { @class = "form-control form-control-sm" })
+                            </div>
+                            <div class="col-sm-3 col-md-3 col-lg-3" style="padding-left: 0px;">
+                                <center><button type="submit" class="btn btn-primary btn-lg submitButton" value="Import" style="margin-top: 12px;">Submit</button></center>
+                            </div>
                         </div>
-                    </center>
-                    <br/>
-                    <center><button type="submit" class="btn btn-primary btn-lg submitButton" value="Import">Submit</button></center>
-                    <br />
+                    </div>
+
+
 
                     
-                    <div id="overlay"  style="display:none;">
+
+                    
+
+
+
+                    
+
+
+                    <!-- Button trigger modal -->
+                    @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#SSEModal">
+                        Launch demo modal
+                    </button>*@
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="SSEModal" tabindex="-1" role="dialog" aria-labelledby="SSEModal" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header" style="background-color: #3b4d5a;">
+                                    <h5 class="modal-title" id="SSEModalTitle" style="color: white;">SSE Electricity</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    @model  ImportDataFromExcel.Models.SSE_Dates
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 15px;">
+                                                <center>
+                                                    <span>
+                                                        Set values to dates for 01/12/2020
+                                                    </span>
+                                                </center>
+                                            </div>
+                                            <div class="col-md-6 col-lg-6">
+                                                @Html.DisplayNameFor(model => model.EarliestContractStartDate_First)
+                                                @Html.EditorFor(model => model.EarliestContractStartDate_First, new { htmlAttributes = new { @class = "form-control" } })
+                                            </div>
+                                            <div class="col-md-6 col-lg-6">
+                                                @Html.DisplayNameFor(model => model.LatestContractStartDate_First)
+                                                @Html.EditorFor(model => model.LatestContractStartDate_First, new { htmlAttributes = new { @class = "form-control" } })
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 15px;">
+                                                <center>
+                                                    <span>
+                                                        Set values to dates for 01/04/2021
+                                                    </span>
+                                                </center>
+                                            </div>
+                                            <div class="col-md-6 col-lg-6">
+                                                @Html.DisplayNameFor(model => model.EarliestContractStartDate_Second)
+                                                @Html.EditorFor(model => model.EarliestContractStartDate_Second, new { htmlAttributes = new { @class = "form-control" } })
+                                            </div>
+                                            <div class="col-md-6 col-lg-6">
+                                                @Html.DisplayNameFor(model => model.LatestContractStartDate_Second)
+                                                @Html.EditorFor(model => model.LatestContractStartDate_Second, new { htmlAttributes = new { @class = "form-control" } })
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 15px;">
+                                                <center>
+                                                    <span>
+                                                        Set values to dates for 01/10/2021
+                                                    </span>
+                                                </center>
+                                            </div>
+                                            <div class="col-md-6 col-lg-6">
+                                                @Html.DisplayNameFor(model => model.EarliestContractStartDate_Third)
+                                                @Html.EditorFor(model => model.EarliestContractStartDate_Third, new { htmlAttributes = new { @class = "form-control" } })
+                                            </div>
+                                            <div class="col-md-6 col-lg-6">
+                                                @Html.DisplayNameFor(model => model.LatestContractStartDate_Third)
+                                                @Html.EditorFor(model => model.LatestContractStartDate_Third, new { htmlAttributes = new { @class = "form-control" } })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div id="overlay" style="display:none;">
                         <center style="margin-top: -50px !important;">
-                            <div class="spinner"></div><br/><span class="loadingSpan" style="">Loading...</span>
+                            <div class="spinner"></div><br /><span class="loadingSpan" style="">Loading...</span>
                         </center>
                     </div>
 
