@@ -4248,8 +4248,27 @@ namespace ImportDataFromExcel.Controllers
             StatusCode = doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("results").ElementAt(0).Descendants("errors").ElementAt(0).Descendants("statusCode").ElementAt(0).Value;
             ReferenceId = doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("results").ElementAt(0).Descendants("referenceId").ElementAt(0).Value;
 
-            CloseExcelFile();
-            PopulateOutputTable();
+            //CloseExcelFile();
+            workBook.Close(true, null, null);
+            application.Quit();
+            Marshal.ReleaseComObject(workSheet);
+            Marshal.ReleaseComObject(workBook);
+            Marshal.ReleaseComObject(application);
+
+            //PopulateOutputTable();
+            ProcessingTime = (DateTime.Now - StartDate).TotalSeconds;
+
+            Results results = new Results();
+            results.Status = Status;
+            results.Object = Object;
+            results.RecordCreated = RecordCreated.ToString();
+            results.RecordFailed = RecordFailed.ToString();
+            results.StartDate = StartDate.ToString();
+            results.ProcessingTime = (Math.Round(ProcessingTime, 2)).ToString();
+            results.MessageError = MessageError;
+            results.StatusCode = StatusCode;
+            results.ReferenceId = ReferenceId;
+            ViewBag.Results = results;
         }
 
         public void ObjectDoesNotExist()
@@ -4260,8 +4279,27 @@ namespace ImportDataFromExcel.Controllers
             StatusCode = "Failed";
             ReferenceId = "first row of Excel file";
 
-            CloseExcelFile();
-            PopulateOutputTable();
+            //CloseExcelFile();
+            workBook.Close(true, null, null);
+            application.Quit();
+            Marshal.ReleaseComObject(workSheet);
+            Marshal.ReleaseComObject(workBook);
+            Marshal.ReleaseComObject(application);
+
+            //PopulateOutputTable();
+            ProcessingTime = (DateTime.Now - StartDate).TotalSeconds;
+
+            Results results = new Results();
+            results.Status = Status;
+            results.Object = Object;
+            results.RecordCreated = RecordCreated.ToString();
+            results.RecordFailed = RecordFailed.ToString();
+            results.StartDate = StartDate.ToString();
+            results.ProcessingTime = (Math.Round(ProcessingTime, 2)).ToString();
+            results.MessageError = MessageError;
+            results.StatusCode = StatusCode;
+            results.ReferenceId = ReferenceId;
+            ViewBag.Results = results;
         }
 
         public void PopulateOutputTable()
