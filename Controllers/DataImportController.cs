@@ -168,7 +168,7 @@ namespace ImportDataFromExcel.Controllers
                                 {
                                     if (isElectricityTariffPrice)
                                     {   
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 8; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -301,7 +301,7 @@ namespace ImportDataFromExcel.Controllers
                                     }
                                     else
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 6; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -441,7 +441,7 @@ namespace ImportDataFromExcel.Controllers
                                 {
                                     if (isElectricityTariffPrice)
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 498; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -566,7 +566,7 @@ namespace ImportDataFromExcel.Controllers
                                     }
                                     else
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 6; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -854,7 +854,7 @@ namespace ImportDataFromExcel.Controllers
                                 {
                                     if (isElectricityTariffPrice)
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 7; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -1219,7 +1219,7 @@ namespace ImportDataFromExcel.Controllers
                                     }
                                     else
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 4; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -1314,7 +1314,7 @@ namespace ImportDataFromExcel.Controllers
                                 {
                                     if (isElectricityTariffPrice)
                                     {
-                                        //for (int row = 3; row <= 4; row++)
+                                        //for (int row = 3; row <= 6; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
                                             recordCreated++;
@@ -1682,7 +1682,7 @@ namespace ImportDataFromExcel.Controllers
                                 {
                                     if (isElectricityTariffPrice)
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 7; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -1808,7 +1808,7 @@ namespace ImportDataFromExcel.Controllers
                                     }
                                     else
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         Dictionary<string, string> UnitRateList = new Dictionary<string, string>();
                                         //for (int row = 3; row <= range.Rows.Count; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
@@ -2018,7 +2018,7 @@ namespace ImportDataFromExcel.Controllers
                                     }
                                     else
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 4; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -2324,7 +2324,7 @@ namespace ImportDataFromExcel.Controllers
                                     }
                                     else
                                     {
-                                        int passToRowNO = 3;
+                                        int passToRowNO = 2;
                                         //for (int row = 2; row <= 4; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
@@ -2523,7 +2523,7 @@ namespace ImportDataFromExcel.Controllers
                                         multipleRecordCreateNo++;
 
                                         json += "{";
-                                        json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
+                                        json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "_"+ yearRow + "\"},";
 
                                         if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
                                             json += "    \"Usage_Band_Min__c\" : \"" + Convert.ToDouble(((Excel.Range)range.Cells[row, 1]).Text) + "\",";
