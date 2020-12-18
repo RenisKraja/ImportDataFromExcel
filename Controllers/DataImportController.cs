@@ -44,8 +44,8 @@ namespace ImportDataFromExcel.Controllers
         private SelectList suppliers = new SelectList(new[]
         {
             new { ID = "1", Name = "British Gas Lite" },
-            new { ID = "2", Name = "British Gas" },
-            new { ID = "3", Name = "British Gas DSC" },
+            new { ID = "2", Name = "British Gas REN" },
+            new { ID = "3", Name = "British Gas ACQ" },
             new { ID = "4", Name = "Smartest Energy Electric" },
             new { ID = "5", Name = "Valda Electricity" },
             new { ID = "6", Name = "EDF" },
