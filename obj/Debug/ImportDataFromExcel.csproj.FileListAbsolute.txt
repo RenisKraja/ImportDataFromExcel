@@ -166,7 +166,6 @@ C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csproj.CopyComplete
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.dll
 C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.pdb
-C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csprojAssemblyReference.cache
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\bin\ImportDataFromExcel.dll.config
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\bin\ImportDataFromExcel.dll
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\bin\ImportDataFromExcel.pdb

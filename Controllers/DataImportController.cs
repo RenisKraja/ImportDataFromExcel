@@ -196,7 +196,7 @@ namespace ImportDataFromExcel.Controllers
                                                 if (day.Last() == '-')
                                                     day = day.Remove(day.Length - 1, 1);
 
-                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1] + "/" + day + "/" + date.Substring(date.Length - 4))).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1] + "/" + day + "/" + date.Substring(date.Length - 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
@@ -207,7 +207,7 @@ namespace ImportDataFromExcel.Controllers
                                                 if (day.Last() == '-')
                                                     day = day.Remove(day.Length - 1, 1);
 
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1] + "/" + day + "/" + date.Substring(date.Length - 4))).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1] + "/" + day + "/" + date.Substring(date.Length - 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
                                                 json += "\"PES_Area__c\" : \"" + methods.GetPESAreaID(((Excel.Range)range.Cells[row, 4]).Text) + "\",";
@@ -334,7 +334,7 @@ namespace ImportDataFromExcel.Controllers
                                                     else if (year == "21")
                                                         year = "2021";
 
-                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + year)).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + year, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 }
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
@@ -351,7 +351,7 @@ namespace ImportDataFromExcel.Controllers
                                                     else if (year == "21")
                                                         year = "2021";
 
-                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + year)).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + year, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 }
                                             }
                                             if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
@@ -463,13 +463,13 @@ namespace ImportDataFromExcel.Controllers
 
                                             if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
                                             {
-                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(((Excel.Range)range.Cells[row, 2]).Text)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(((Excel.Range)range.Cells[row, 2]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 //earliestContractStartDate = ((Excel.Range)range.Cells[row, 2]).Text;
                                                 //json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(earliestContractStartDate.Substring(3, 2) + "/" + earliestContractStartDate.Substring(0, 2) + "/" + earliestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
                                             {
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(((Excel.Range)range.Cells[row, 3]).Text)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(((Excel.Range)range.Cells[row, 3]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 //latestContractStartDate = ((Excel.Range)range.Cells[row, 3]).Text;
                                                 //json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(latestContractStartDate.Substring(3, 2) + "/" + latestContractStartDate.Substring(0, 2) + "/" + latestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
@@ -588,12 +588,12 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
                                             {
                                                 string date = ((Excel.Range)range.Cells[row, 2]).Text;
-                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
                                             {
                                                 string date = ((Excel.Range)range.Cells[row, 3]).Text;
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
                                             {
@@ -741,9 +741,9 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
                                                 json += "    \"Usage_Band_Max__c\" : \"" + ((Excel.Range)range.Cells[row, 12]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
-                                                json += "    \"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(((Excel.Range)range.Cells[row, 13]).Text)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "    \"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(((Excel.Range)range.Cells[row, 13]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
-                                                json += "    \"LatestContractStartDate__c\" : \"" + (DateTime.Parse(((Excel.Range)range.Cells[row, 14]).Text)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "    \"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(((Excel.Range)range.Cells[row, 14]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
 
                                             json += "    \"Electricity_Tariff__c\" : \"a0h1B00000FLP7H\",";
                                             json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
@@ -1366,7 +1366,7 @@ namespace ImportDataFromExcel.Controllers
                                                         if (day.Last() == '-')
                                                             day = day.Remove(day.Length - 1, 1);
 
-                                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + date.Substring(date.Length - 4))).ToString("yyyy-MM-dd") + "\",";
+                                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + date.Substring(date.Length - 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                     }
                                                 }
                                                 else if (date.ToLower().Contains("after"))
@@ -1378,8 +1378,8 @@ namespace ImportDataFromExcel.Controllers
                                                         if (day.Last() == '-')
                                                             day = day.Remove(day.Length - 1, 1);
 
-                                                        json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + date.Substring(date.Length - 4))).ToString("yyyy-MM-dd") + "\",";
-                                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + date.Substring(date.Length - 4)).AddMonths(6)).ToString("yyyy-MM-dd") + "\",";
+                                                        json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + date.Substring(date.Length - 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + day + "/" + date.Substring(date.Length - 4), "MM/dd/yyyy", null).AddMonths(6)).ToString("yyyy-MM-dd") + "\",";
                                                     }
                                                 }
                                             }
@@ -1455,17 +1455,17 @@ namespace ImportDataFromExcel.Controllers
                                             {
                                                 string date = ((Excel.Range)range.Cells[row, 8]).Text;
                                                 if (date.Contains("-"))
-                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Substring(date.Length - 2) + "/" + date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + date.Substring(0, 4))).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Substring(date.Length - 2) + "/" + date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + date.Substring(0, 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 else
-                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
                                             {
                                                 string date = ((Excel.Range)range.Cells[row, 9]).Text;
                                                 if (date.Contains("-"))
-                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(methods.GetMonth(date.Substring(date.Length - 2) + "/" + date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + date.Substring(0, 4))).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(methods.GetMonth(date.Substring(date.Length - 2) + "/" + date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1]) + "/" + date.Substring(0, 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 else
-                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
                                                 json += "    \"Standing_Charge__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 10]).Text) * 100) + "\",";
@@ -1537,8 +1537,8 @@ namespace ImportDataFromExcel.Controllers
                                                 string month = methods.GetMonth(((Excel.Range)range.Cells[row, 4]).Text);
                                                 if (month != string.Empty)
                                                 {
-                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(month + "/1/" + ((Excel.Range)range.Cells[row, 5]).Text)).ToString("yyyy-MM-dd") + "\",";
-                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(month + "/" + DateTime.DaysInMonth(Convert.ToInt32(((Excel.Range)range.Cells[row, 5]).Text), Convert.ToInt32(month)) + "/" + ((Excel.Range)range.Cells[row, 5]).Text).ToString("yyyy-MM-dd")) + "\",";
+                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(month + "/1/" + ((Excel.Range)range.Cells[row, 5]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(month + "/" + DateTime.DaysInMonth(Convert.ToInt32(((Excel.Range)range.Cells[row, 5]).Text), Convert.ToInt32(month)) + "/" + ((Excel.Range)range.Cells[row, 5]).Text, "MM/dd/yyyy", null).ToString("yyyy-MM-dd")) + "\",";
                                                 }
                                             }
                                             if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
@@ -1621,8 +1621,8 @@ namespace ImportDataFromExcel.Controllers
                                                 string month = methods.GetMonth(((Excel.Range)range.Cells[row, 4]).Text);
                                                 if (month != string.Empty)
                                                 {
-                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(month + "/1/" + ((Excel.Range)range.Cells[row, 5]).Text)).ToString("yyyy-MM-dd") + "\",";
-                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(month + "/" + DateTime.DaysInMonth(Convert.ToInt32(((Excel.Range)range.Cells[row, 5]).Text), Convert.ToInt32(month)) + "/" + ((Excel.Range)range.Cells[row, 5]).Text).ToString("yyyy-MM-dd")) + "\",";
+                                                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(month + "/1/" + ((Excel.Range)range.Cells[row, 5]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(month + "/" + DateTime.DaysInMonth(Convert.ToInt32(((Excel.Range)range.Cells[row, 5]).Text), Convert.ToInt32(month)) + "/" + ((Excel.Range)range.Cells[row, 5]).Text, "MM/dd/yyyy", null).ToString("yyyy-MM-dd")) + "\",";
                                                 }
                                             }
                                             if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
@@ -1953,14 +1953,14 @@ namespace ImportDataFromExcel.Controllers
                                             DateTime earliestDate = DateTime.MinValue;
                                             if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
                                             {
-                                                earliestDate = DateTime.Parse(((Excel.Range)range.Cells[row, 12]).Text);
+                                                earliestDate = DateTime.ParseExact(((Excel.Range)range.Cells[row, 12]).Text, "MM/dd/yyyy", null);
                                                 json += "\"EarliestContractStartDate__c\" : \"" + earliestDate.ToString("yyyy-MM-dd") + "\",";
                                                 //earliestContractStartDate = ((Excel.Range)range.Cells[row, 2]).Text;
                                                 //json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(earliestContractStartDate.Substring(3, 2) + "/" + earliestContractStartDate.Substring(0, 2) + "/" + earliestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
                                             {
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(((Excel.Range)range.Cells[row, 13]).Text)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(((Excel.Range)range.Cells[row, 13]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 //latestContractStartDate = ((Excel.Range)range.Cells[row, 3]).Text;
                                                 //json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(latestContractStartDate.Substring(3, 2) + "/" + latestContractStartDate.Substring(0, 2) + "/" + latestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
@@ -2057,14 +2057,14 @@ namespace ImportDataFromExcel.Controllers
                                             DateTime earliestDate = DateTime.MinValue;
                                             if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
                                             {
-                                                earliestDate = DateTime.Parse(((Excel.Range)range.Cells[row, 12]).Text);
+                                                earliestDate = DateTime.ParseExact(((Excel.Range)range.Cells[row, 12]).Text, "MM/dd/yyyy", null);
                                                 json += "\"EarliestContractStartDate__c\" : \"" + earliestDate.ToString("yyyy-MM-dd") + "\",";
                                                 //earliestContractStartDate = ((Excel.Range)range.Cells[row, 2]).Text;
                                                 //json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(earliestContractStartDate.Substring(3, 2) + "/" + earliestContractStartDate.Substring(0, 2) + "/" + earliestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
                                             {
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(((Excel.Range)range.Cells[row, 13]).Text)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(((Excel.Range)range.Cells[row, 13]).Text, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                                 //latestContractStartDate = ((Excel.Range)range.Cells[row, 3]).Text;
                                                 //json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(latestContractStartDate.Substring(3, 2) + "/" + latestContractStartDate.Substring(0, 2) + "/" + latestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
@@ -2235,9 +2235,9 @@ namespace ImportDataFromExcel.Controllers
 
                                             if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
                                             {
-                                                DateTime date = DateTime.Parse(((Excel.Range)range.Cells[row, 2]).Text);
-                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date.AddMonths(-1).Month + "/15/" + date.AddMonths(-1).Year).ToString("yyyy-MM-dd")) + "\",";
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date.Month + "/14/" + date.Year).ToString("yyyy-MM-dd")) + "\",";
+                                                DateTime date = DateTime.ParseExact(((Excel.Range)range.Cells[row, 2]).Text, "MM/dd/yyyy", null);
+                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date.AddMonths(-1).Month + "/15/" + date.AddMonths(-1).Year, "MM/dd/yyyy", null).ToString("yyyy-MM-dd")) + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date.Month + "/14/" + date.Year, "MM/dd/yyyy", null).ToString("yyyy-MM-dd")) + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
                                             {
@@ -2355,12 +2355,12 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
                                             {
                                                 string date = ((Excel.Range)range.Cells[row, 7]).Text;
-                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
                                             {
                                                 string date = ((Excel.Range)range.Cells[row, 8]).Text;
-                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                                json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                             }
                                             if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty) && ((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
                                             {
@@ -2460,12 +2460,12 @@ namespace ImportDataFromExcel.Controllers
                                     if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
                                     {
                                         string date = ((Excel.Range)range.Cells[row, 8]).Text;
-                                        json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                        json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                     }
                                     if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
                                     {
                                         string date = ((Excel.Range)range.Cells[row, 9]).Text;
-                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                     }
 
                                     json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
@@ -2590,12 +2590,12 @@ namespace ImportDataFromExcel.Controllers
                                         if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
                                         {
                                             string date = ((Excel.Range)range.Cells[row, 16]).Text;
-                                            json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                            json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                         }
                                         if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
                                         {
                                             string date = ((Excel.Range)range.Cells[row, 17]).Text;
-                                            json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(date)).ToString("yyyy-MM-dd") + "\",";
+                                            json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
                                         }
 
                                         json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
