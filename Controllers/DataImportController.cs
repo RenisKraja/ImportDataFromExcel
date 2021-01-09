@@ -201,7 +201,7 @@ namespace ImportDataFromExcel.Controllers
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
                                             {
-                                                string date = ((Excel.Range)range.Cells[row, 2]).Text;
+                                                string date = ((Excel.Range)range.Cells[row, 3]).Text;
 
                                                 string day = date.Substring(0, 2);
                                                 if (day.Last() == '-')
