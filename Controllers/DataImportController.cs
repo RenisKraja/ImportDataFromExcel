@@ -167,7 +167,7 @@ namespace ImportDataFromExcel.Controllers
                             case 1:
                                 {
                                     if (isElectricityTariffPrice)
-                                    {   
+                                    { 
                                         int passToRowNO = 2;
                                         //for (int row = 2; row <= 8; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
