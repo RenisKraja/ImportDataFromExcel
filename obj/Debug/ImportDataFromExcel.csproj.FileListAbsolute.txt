@@ -251,7 +251,6 @@ C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\obj\Debu
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csproj.CopyComplete
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.dll
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.pdb
-C:\Users\Renis Kraja\Desktop\Salesforce\ImportDataFromExcel\ImportDataFromExcel\obj\Debug\ImportDataFromExcel.csprojAssemblyReference.cache
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\bin\ImportDataFromExcel.dll.config
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\bin\ImportDataFromExcel.dll
 C:\Users\ledja\OneDrive\Desktop\TariffUploader V1.2\bin\ImportDataFromExcel.pdb
