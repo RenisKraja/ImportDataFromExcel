@@ -51,6 +51,12 @@ namespace ImportDataFromExcel.Models
                 case "eve, weekend & night rate":
                     unitTypeFieldName = "Weekend_Rate__c";
                     break;
+                case "evening / weekend / night rate":
+                    unitTypeFieldName = "Weekend_Rate__c";
+                    break;
+                case "evening / weekend rate":
+                    unitTypeFieldName = "Weekend_Rate__c";
+                    break;
                 case "standing charge":
                     unitTypeFieldName = "Standing_Charge__c";
                     break;
