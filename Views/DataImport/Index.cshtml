@@ -174,11 +174,11 @@
                                 <div class="modal-body">
                                     @model  ImportDataFromExcel.Models.SSE_Dates
                                     <div class="container">
-                                        <div class="row">
+                                        <div class="row" style="margin-bottom: 10px;">
                                             <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 15px;">
                                                 <center>
                                                     <span>
-                                                        Set values to dates for 01/12/2020
+                                                        Set values to dates for 01/12/2020 @*@Html.EditorFor(model => model.EarliestContractStartDate_First, new { htmlAttributes = new { @class = "form-control", Style = "width: 40%;  display: inline-block; background-color: #dee2e6;" } })*@
                                                     </span>
                                                 </center>
                                             </div>
@@ -191,12 +191,12 @@
                                                 @Html.EditorFor(model => model.LatestContractStartDate_First, new { htmlAttributes = new { @class = "form-control" } })
                                             </div>
                                         </div>
-                                        <hr />
-                                        <div class="row">
+                                        @*<hr />*@
+                                        <div class="row" style="margin-bottom: 10px;">
                                             <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 15px;">
                                                 <center>
                                                     <span>
-                                                        Set values to dates for 01/04/2021
+                                                        Set values to dates for 01/04/2021 @*@Html.EditorFor(model => model.EarliestContractStartDate_First, new { htmlAttributes = new { @class = "form-control", Style = "width: 40%; display: inline-block; background-color: #dee2e6;" } })*@
                                                     </span>
                                                 </center>
                                             </div>
@@ -209,12 +209,12 @@
                                                 @Html.EditorFor(model => model.LatestContractStartDate_Second, new { htmlAttributes = new { @class = "form-control" } })
                                             </div>
                                         </div>
-                                        <hr />
+                                        @*<hr />*@
                                         <div class="row">
                                             <div class="col-sm-12 col-md-12 col-lg-12" style="margin-bottom: 15px;">
                                                 <center>
                                                     <span>
-                                                        Set values to dates for 01/10/2021
+                                                        Set values to dates for 01/10/2021 @*@Html.EditorFor(model => model.EarliestContractStartDate_Third, new { htmlAttributes = new { @class = "form-control", Style = "width: 40%;  display: inline-block; background-color: #dee2e6;" } })*@
                                                     </span>
                                                 </center>
                                             </div>

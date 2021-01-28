@@ -17,6 +17,7 @@ using System.Data;
 using System.Web.Http.Routing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace ImportDataFromExcel.Controllers
 {
@@ -131,7 +132,7 @@ namespace ImportDataFromExcel.Controllers
                         if (System.IO.File.Exists(path))
                             System.IO.File.Delete(path);
                         excelFile.SaveAs(path);
-                        
+
                         application = new Excel.Application();
                         workBook = application.Workbooks.Open(path);
                         workSheet = workBook.ActiveSheet;
@@ -198,7 +199,7 @@ namespace ImportDataFromExcel.Controllers
                                             {
                                                 //23-11-2020
                                                 string date = ((Excel.Range)range.Cells[row, 2]).Text;
-                                                
+
                                                 string day = date.Substring(0, 2);
                                                 if (day.Last() == '-')
                                                 {
@@ -207,7 +208,7 @@ namespace ImportDataFromExcel.Controllers
                                                 }
 
                                                 json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date.Split(new string[] { "-" }, 3, StringSplitOptions.None)[1] + "/" + day + "/" + date.Substring(date.Length - 4), "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
-                                                
+
                                             }
                                             if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
                                             {
@@ -762,9 +763,9 @@ namespace ImportDataFromExcel.Controllers
                                                 &&
                                                 (((Excel.Range)range.Cells[row, 4]).Text != string.Empty)
                                                 &&
-                                                ((((Excel.Range)range.Cells[row, 4]).Text == "OP") || (((Excel.Range)range.Cells[row, 4]).Text.Substring(0, 2) == "HH")) 
+                                                ((((Excel.Range)range.Cells[row, 4]).Text == "OP") || (((Excel.Range)range.Cells[row, 4]).Text.Substring(0, 2) == "HH"))
                                                )
-                                            {   
+                                            {
                                                 continue;
                                             }
                                             if (
@@ -875,6 +876,10 @@ namespace ImportDataFromExcel.Controllers
                                         {
                                             if (((Excel.Range)range.Cells[row, 2] == null) || (((Excel.Range)range.Cells[row, 2]).Text == string.Empty))
                                                 continue;
+
+                                            if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty) && (!((Excel.Range)range.Cells[row, 2]).Text.Contains("Level1")))
+                                                continue;
+
 
                                             recordCreated++;
                                             multipleRecordCreateNo++;
@@ -1345,16 +1350,16 @@ namespace ImportDataFromExcel.Controllers
                                             {
                                                 string[] usageBand = ((Excel.Range)range.Cells[row, 1]).Text.Split('-');
                                                 if (usageBand.Length == 2)
-                                                if (int.TryParse(usageBand[0], out int outputMin) && int.TryParse(usageBand[1], out int outputMax))
-                                                {
-                                                    json += "\"Usage_Band_Min__c\" : \"" + usageBand[0] + "\",";
-                                                    json += "\"Usage_Band_Max__c\" : \"" + usageBand[1] + "\",";
-                                                }
-                                                else
-                                                {
-                                                    json += "\"Usage_Band_Min__c\" : \"0\",";
-                                                    json += "\"Usage_Band_Max__c\" : \"0\",";
-                                                }
+                                                    if (int.TryParse(usageBand[0], out int outputMin) && int.TryParse(usageBand[1], out int outputMax))
+                                                    {
+                                                        json += "\"Usage_Band_Min__c\" : \"" + usageBand[0] + "\",";
+                                                        json += "\"Usage_Band_Max__c\" : \"" + usageBand[1] + "\",";
+                                                    }
+                                                    else
+                                                    {
+                                                        json += "\"Usage_Band_Min__c\" : \"0\",";
+                                                        json += "\"Usage_Band_Max__c\" : \"0\",";
+                                                    }
                                             }
                                             if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
                                             {
@@ -1423,6 +1428,10 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 4] == null) || (((Excel.Range)range.Cells[row, 4]).Text == string.Empty))
                                                 continue;
 
+                                            // skip record if Unit Rate is empty
+                                            if ((((Excel.Range)range.Cells[row, 8] == null) || (((Excel.Range)range.Cells[row, 8]).Text == string.Empty)) && (((Excel.Range)range.Cells[row, 9] == null) || (((Excel.Range)range.Cells[row, 9]).Text == string.Empty)))
+                                                continue;
+
                                             recordCreated++;
                                             multipleRecordCreateNo++;
 
@@ -1440,7 +1449,7 @@ namespace ImportDataFromExcel.Controllers
                                                 if (electricityTariff != string.Empty)
                                                     json += "\"Electricity_Tariff__c\" : \"" + electricityTariff + "\",";
                                             }
-                                            
+
                                             if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
                                             {
                                                 string pesArea = methods.GetPESAreaID(((Excel.Range)range.Cells[row, 6]).Text);
@@ -1651,9 +1660,9 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 6] == null) || (((Excel.Range)range.Cells[row, 6]).Text == string.Empty))
                                                 continue;
 
-                                            //// skip record if Unit Rate is empty
-                                            //if ((((Excel.Range)range.Cells[row, 12] == null) || (((Excel.Range)range.Cells[row, 12]).Text == string.Empty)) && (((Excel.Range)range.Cells[row, 13] == null) || (((Excel.Range)range.Cells[row, 13]).Text == string.Empty)))
-                                            //    continue;
+                                            // skip record if Unit Rate is empty
+                                            if ((((Excel.Range)range.Cells[row, 12] == null) || (((Excel.Range)range.Cells[row, 12]).Text == string.Empty)) && (((Excel.Range)range.Cells[row, 13] == null) || (((Excel.Range)range.Cells[row, 13]).Text == string.Empty)))
+                                                continue;
 
                                             recordCreated++;
                                             multipleRecordCreateNo++;
@@ -1689,7 +1698,7 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
                                                 json += "    \"Usage_Band_Min__c\" : \"" + ((Excel.Range)range.Cells[row, 9]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
-                                                json += "    \"Usage_Band_Max__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text+ "\",";
+                                                json += "    \"Usage_Band_Max__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
                                                 json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 11]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
@@ -1780,7 +1789,7 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
                                                 json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 11]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
-                                                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 12]).Text + "\",";                                            
+                                                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 12]).Text + "\",";
 
                                             json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
                                             //json += "\"Tariff_Type__c\" : \"1\",";
@@ -2083,9 +2092,9 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 8] == null) || (((Excel.Range)range.Cells[row, 8]).Text == string.Empty))
                                                 continue;
 
-                                            ////skip record if Unit Rate is empty
-                                            //if ((((Excel.Range)range.Cells[row, 25] == null) || (((Excel.Range)range.Cells[row, 25]).Text == string.Empty)))
-                                            //    continue;
+                                            //skip record if Unit Rate is empty
+                                            if ((((Excel.Range)range.Cells[row, 25] == null) || (((Excel.Range)range.Cells[row, 25]).Text == string.Empty)))
+                                                continue;
 
                                             recordCreated++;
                                             multipleRecordCreateNo++;
@@ -2157,7 +2166,7 @@ namespace ImportDataFromExcel.Controllers
                                                 json += "    \"Night_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 26]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 27] != null) && (((Excel.Range)range.Cells[row, 27]).Text != string.Empty))
                                                 json += "    \"Weekend_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 27]).Text + "\",";
-                                            
+
                                             json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
                                             json += "\"Tariff_Type__c\" : \"1\",";
 
@@ -2268,7 +2277,7 @@ namespace ImportDataFromExcel.Controllers
                                                 //latestContractStartDate = ((Excel.Range)range.Cells[row, 3]).Text;
                                                 //json += "\"LatestContractStartDate__c\" : \"" + (DateTime.Parse(latestContractStartDate.Substring(3, 2) + "/" + latestContractStartDate.Substring(0, 2) + "/" + latestContractStartDate.Substring(6, 4))).ToString("yyyy-MM-dd") + "\",";
                                             }
-                                            
+
                                             if (((Excel.Range)range.Cells[row, 24] != null) && (((Excel.Range)range.Cells[row, 24]).Text != string.Empty))
                                                 json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 24]).Text + "\",";
                                             if (((Excel.Range)range.Cells[row, 28] != null) && (((Excel.Range)range.Cells[row, 28]).Text != string.Empty))
@@ -2323,13 +2332,13 @@ namespace ImportDataFromExcel.Controllers
                                             if (((Excel.Range)range.Cells[row, 8] == null) || (((Excel.Range)range.Cells[row, 8]).Text == string.Empty))
                                                 continue;
 
-                                            ////skip record if Unit Rate is empty
-                                            //if (
-                                            //    (((Excel.Range)range.Cells[row, 13] == null) || (((Excel.Range)range.Cells[row, 13]).Text == string.Empty)) &&
-                                            //    (((Excel.Range)range.Cells[row, 14] == null) || (((Excel.Range)range.Cells[row, 14]).Text == string.Empty)) &&
-                                            //    (((Excel.Range)range.Cells[row, 17] == null) || (((Excel.Range)range.Cells[row, 17]).Text == string.Empty))
-                                            //   )
-                                            //    continue;
+                                            //skip record if Unit Rate is empty
+                                            if (
+                                                (((Excel.Range)range.Cells[row, 13] == null) || (((Excel.Range)range.Cells[row, 13]).Text == string.Empty)) &&
+                                                (((Excel.Range)range.Cells[row, 14] == null) || (((Excel.Range)range.Cells[row, 14]).Text == string.Empty)) &&
+                                                (((Excel.Range)range.Cells[row, 17] == null) || (((Excel.Range)range.Cells[row, 17]).Text == string.Empty))
+                                               )
+                                                continue;
 
                                             recordCreated++;
                                             multipleRecordCreateNo++;
@@ -2668,98 +2677,104 @@ namespace ImportDataFromExcel.Controllers
                             }
                             else
                             {
-                                //for (int row = 3; row <= 4; row++)
-                                for (int row = 2; row <= range.Rows.Count; row++)
-                                {
-                                    if (((Excel.Range)range.Cells[row, 7] == null) || (((Excel.Range)range.Cells[row, 7]).Text == string.Empty))
-                                        continue;
+                                string crownGasPower = SupplierNO15(ref multipleRecordCreateNo, ref json, ref range, ref methods, ref gasTariffId, ref requestCreate, ref responseCreate, ref uri);
+                                if (crownGasPower.Equals("error"))
+                                    return View("Error");
+                                else
+                                    json = crownGasPower;
 
-                                    recordCreated++;
-                                    multipleRecordCreateNo++;
+                                ////for (int row = 3; row <= 4; row++)
+                                //for (int row = 2; row <= range.Rows.Count; row++)
+                                //{
+                                //    if (((Excel.Range)range.Cells[row, 7] == null) || (((Excel.Range)range.Cells[row, 7]).Text == string.Empty))
+                                //        continue;
 
-                                    json += "{";
-                                    json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
+                                //    recordCreated++;
+                                //    multipleRecordCreateNo++;
 
-                                    if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
-                                    {
-                                        string ldz = ((Excel.Range)range.Cells[row, 1]).Text;
-                                        json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
-                                    }
-                                    string standingCharge = string.Empty;
-                                    if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
-                                    {
-                                        standingCharge = ((Excel.Range)range.Cells[row, 3]).Text;
-                                        json += "    \"Standing_Charge__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 3]).Text) * 100) + "\",";
-                                    }
-                                    if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
-                                        json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 4]).Text + "\",";
-                                    if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
-                                        json += "    \"Usage_Band_Min__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 5]).Text), @"[,]", "") + "\",";
-                                    if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
-                                        json += "    \"Usage_Band_Max__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 6]).Text), @"[,]", "") + "\",";
-                                    if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
-                                    {
-                                        gasTariffId = methods.GetGasTariffIdCG(((Excel.Range)range.Cells[row, 7]).Text, standingCharge);
-                                        if (gasTariffId != string.Empty)
-                                            json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
-                                    }
-                                    if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
-                                    {
-                                        string date = ((Excel.Range)range.Cells[row, 8]).Text;
-                                        string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
-                                        if (dateArray[0].Length == 1)
-                                            date = "0" + date;
-                                        if (dateArray[1].Length == 1)
-                                            date = date.Insert(3, "0");
+                                //    json += "{";
+                                //    json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
 
-                                        json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
-                                    }
-                                    if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
-                                    {
-                                        string date = ((Excel.Range)range.Cells[row, 9]).Text;
-                                        string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
-                                        if (dateArray[0].Length == 1)
-                                            date = "0" + date;
-                                        if (dateArray[1].Length == 1)
-                                            date = date.Insert(3, "0");
+                                //    if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                                //    {
+                                //        string ldz = ((Excel.Range)range.Cells[row, 1]).Text;
+                                //        json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
+                                //    }
+                                //    string standingCharge = string.Empty;
+                                //    if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                                //    {
+                                //        standingCharge = ((Excel.Range)range.Cells[row, 3]).Text;
+                                //        json += "    \"Standing_Charge__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 3]).Text) * 100) + "\",";
+                                //    }
+                                //    if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                                //        json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 4]).Text + "\",";
+                                //    if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                                //        json += "    \"Usage_Band_Min__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 5]).Text), @"[,]", "") + "\",";
+                                //    if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                                //        json += "    \"Usage_Band_Max__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 6]).Text), @"[,]", "") + "\",";
+                                //    if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
+                                //    {
+                                //        gasTariffId = methods.GetGasTariffIdCG(((Excel.Range)range.Cells[row, 7]).Text, standingCharge);
+                                //        if (gasTariffId != string.Empty)
+                                //            json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                                //    }
+                                //    if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                                //    {
+                                //        string date = ((Excel.Range)range.Cells[row, 8]).Text;
+                                //        string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                                //        if (dateArray[0].Length == 1)
+                                //            date = "0" + date;
+                                //        if (dateArray[1].Length == 1)
+                                //            date = date.Insert(3, "0");
 
-                                        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
-                                    }
+                                //        json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                //    }
+                                //    if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                                //    {
+                                //        string date = ((Excel.Range)range.Cells[row, 9]).Text;
+                                //        string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                                //        if (dateArray[0].Length == 1)
+                                //            date = "0" + date;
+                                //        if (dateArray[1].Length == 1)
+                                //            date = date.Insert(3, "0");
 
-                                    json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
-                                    //json += "\"Tariff_Type__c\" : \"1\",";
+                                //        json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                //    }
 
-                                    if (json.Last() == ',')
-                                        json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
+                                //    json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
+                                //    //json += "\"Tariff_Type__c\" : \"1\",";
 
-                                    json += "},";
+                                //    if (json.Last() == ',')
+                                //        json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
 
-                                    if ((multipleRecordCreateNo == 200) && (row != range.Rows.Count))
-                                    {
-                                        json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
-                                        json += "]";
-                                        json += "}";
+                                //    json += "},";
 
-                                        requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                                        responseCreate = Client.SendAsync(requestCreate).Result;
-                                        result = responseCreate.Content.ReadAsStringAsync().Result;
+                                //    if ((multipleRecordCreateNo == 200) && (row != range.Rows.Count))
+                                //    {
+                                //        json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                                //        json += "]";
+                                //        json += "}";
 
-                                        doc = XDocument.Parse(result);
-                                        if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
-                                        {
-                                            ImportFailed(doc);
-                                            return View("Error");
-                                        }
+                                //        requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                                //        responseCreate = Client.SendAsync(requestCreate).Result;
+                                //        result = responseCreate.Content.ReadAsStringAsync().Result;
 
-                                        requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
-                                        requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
-                                        requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-                                        json = "{";
-                                        json += "\"records\" :[";
-                                        RecordCreated += multipleRecordCreateNo;
-                                        multipleRecordCreateNo = 0;
-                                    }
-                                }
+                                //        doc = XDocument.Parse(result);
+                                //        if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                                //        {
+                                //            ImportFailed(doc);
+                                //            return View("Error");
+                                //        }
+
+                                //        requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                                //        requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                                //        requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                                //        json = "{";
+                                //        json += "\"records\" :[";
+                                //        RecordCreated += multipleRecordCreateNo;
+                                //        multipleRecordCreateNo = 0;
+                                //    }
+                                //}
                             }
                         }
                         //else 
@@ -2772,151 +2787,158 @@ namespace ImportDataFromExcel.Controllers
                             }
                             else
                             {
-                                //for (int row = 3; row <= 4; row++)
-                                for (int row = 2; row <= range.Rows.Count; row++)
-                                {
-                                    for (int yearRow = 1; yearRow <= 3; yearRow++)
-                                    {
-                                        if ((yearRow == 1) && (((Excel.Range)range.Cells[row, 4] == null) || (((Excel.Range)range.Cells[row, 4]).Text == string.Empty)))
-                                            continue;
-                                        else if ((yearRow == 2) && (((Excel.Range)range.Cells[row, 8] == null) || (((Excel.Range)range.Cells[row, 8]).Text == string.Empty)))
-                                            continue;
-                                        else if ((yearRow == 3) && (((Excel.Range)range.Cells[row, 12] == null) || (((Excel.Range)range.Cells[row, 12]).Text == string.Empty)))
-                                            continue;
 
-                                        recordCreated++;
-                                        multipleRecordCreateNo++;
+                                string dyceEnergy = SupplierNO16_17(ref multipleRecordCreateNo, ref json, ref range, ref methods, ref gasTariffId, ref requestCreate, ref responseCreate, ref uri, ref supplierNO);
+                                if (dyceEnergy.Equals("error"))
+                                    return View("Error");
+                                else
+                                    json = dyceEnergy;
+                                ////for (int row = 3; row <= 4; row++)
+                                //for (int row = 2; row <= range.Rows.Count; row++)
+                                //{
+                                //    for (int yearRow = 1; yearRow <= 3; yearRow++)
+                                //    {
+                                //        if ((yearRow == 1) && (((Excel.Range)range.Cells[row, 4] == null) || (((Excel.Range)range.Cells[row, 4]).Text == string.Empty)))
+                                //            continue;
+                                //        else if ((yearRow == 2) && (((Excel.Range)range.Cells[row, 8] == null) || (((Excel.Range)range.Cells[row, 8]).Text == string.Empty)))
+                                //            continue;
+                                //        else if ((yearRow == 3) && (((Excel.Range)range.Cells[row, 12] == null) || (((Excel.Range)range.Cells[row, 12]).Text == string.Empty)))
+                                //            continue;
 
-                                        json += "{";
-                                        json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "_"+ yearRow + "\"},";
+                                //        recordCreated++;
+                                //        multipleRecordCreateNo++;
 
-                                        if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
-                                            json += "    \"Usage_Band_Min__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 1]).Text), @"[,]", "") + "\",";
-                                        if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
-                                            json += "    \"Usage_Band_Max__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 2]).Text), @"[,]", "") + "\",";
-                                        if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
-                                        {
-                                            string ldz = ((Excel.Range)range.Cells[row, 3]).Text;
-                                            json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
-                                        }
+                                //        json += "{";
+                                //        json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "_" + yearRow + "\"},";
 
-                                        if (yearRow == 1)
-                                        {
-                                            if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
-                                            {
-                                                if (supplierNO == 16)
-                                                    gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 4]).Text);
-                                                else
-                                                    gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 4]).Text);
+                                //        if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                                //            json += "    \"Usage_Band_Min__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 1]).Text), @"[,]", "") + "\",";
+                                //        if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
+                                //            json += "    \"Usage_Band_Max__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 2]).Text), @"[,]", "") + "\",";
+                                //        if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                                //        {
+                                //            string ldz = ((Excel.Range)range.Cells[row, 3]).Text;
+                                //            json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
+                                //        }
 
-                                                if (gasTariffId != string.Empty)
-                                                    json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
-                                            }
-                                            if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
-                                                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 5]).Text + "\",";
-                                            if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
-                                                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 6]).Text + "\",";
-                                        }
-                                        else if (yearRow == 2)
-                                        {
-                                            if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
-                                            {
-                                                if (supplierNO == 15)
-                                                    gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 8]).Text);
-                                                else
-                                                    gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 8]).Text);
+                                //        if (yearRow == 1)
+                                //        {
+                                //            if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                                //            {
+                                //                if (supplierNO == 16)
+                                //                    gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 4]).Text);
+                                //                else
+                                //                    gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 4]).Text);
 
-                                                if (gasTariffId != string.Empty)
-                                                    json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
-                                            }
-                                            if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
-                                                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 9]).Text + "\",";
-                                            if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
-                                                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text + "\",";
-                                        }
-                                        else if (yearRow == 3)
-                                        {
-                                            if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
-                                            {
-                                                if (supplierNO == 15)
-                                                    gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 12]).Text);
-                                                else
-                                                    gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 12]).Text);
+                                //                if (gasTariffId != string.Empty)
+                                //                    json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                                //            }
+                                //            if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                                //                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 5]).Text + "\",";
+                                //            if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                                //                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 6]).Text + "\",";
+                                //        }
+                                //        else if (yearRow == 2)
+                                //        {
+                                //            if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                                //            {
+                                //                if (supplierNO == 15)
+                                //                    gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 8]).Text);
+                                //                else
+                                //                    gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 8]).Text);
 
-                                                if (gasTariffId != string.Empty)
-                                                    json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
-                                            }
-                                            if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
-                                                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 13]).Text + "\",";
-                                            if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
-                                                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 14]).Text + "\",";
-                                        }
+                                //                if (gasTariffId != string.Empty)
+                                //                    json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                                //            }
+                                //            if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                                //                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 9]).Text + "\",";
+                                //            if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
+                                //                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text + "\",";
+                                //        }
+                                //        else if (yearRow == 3)
+                                //        {
+                                //            if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
+                                //            {
+                                //                if (supplierNO == 15)
+                                //                    gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 12]).Text);
+                                //                else
+                                //                    gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 12]).Text);
 
-                                        if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
-                                        {
-                                            string date = ((Excel.Range)range.Cells[row, 16]).Text;
-                                            string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
-                                            if (dateArray[0].Length == 1)
-                                                date = "0" + date;
-                                            if (dateArray[1].Length == 1)
-                                                date = date.Insert(3, "0");
+                                //                if (gasTariffId != string.Empty)
+                                //                    json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                                //            }
+                                //            if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
+                                //                json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 13]).Text + "\",";
+                                //            if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
+                                //                json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 14]).Text + "\",";
+                                //        }
 
-                                            json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
-                                        }
-                                        if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
-                                        {
-                                            string date = ((Excel.Range)range.Cells[row, 17]).Text;
-                                            string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
-                                            if (dateArray[0].Length == 1)
-                                                date = "0" + date;
-                                            if (dateArray[1].Length == 1)
-                                                date = date.Insert(3, "0");
+                                //        if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
+                                //        {
+                                //            string date = ((Excel.Range)range.Cells[row, 16]).Text;
+                                //            string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                                //            if (dateArray[0].Length == 1)
+                                //                date = "0" + date;
+                                //            if (dateArray[1].Length == 1)
+                                //                date = date.Insert(3, "0");
 
-                                            json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
-                                        }
+                                //            json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                //        }
+                                //        if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
+                                //        {
+                                //            string date = ((Excel.Range)range.Cells[row, 17]).Text;
+                                //            string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                                //            if (dateArray[0].Length == 1)
+                                //                date = "0" + date;
+                                //            if (dateArray[1].Length == 1)
+                                //                date = date.Insert(3, "0");
 
-                                        json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
-                                        //json += "\"Tariff_Type__c\" : \"1\",";
+                                //            json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                                //        }
 
-                                        if (json.Last() == ',')
-                                            json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
+                                //        json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
+                                //        //json += "\"Tariff_Type__c\" : \"1\",";
 
-                                        json += "},";
+                                //        if (json.Last() == ',')
+                                //            json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
 
-                                        if (yearRow == 3)
-                                        {
-                                            if ((multipleRecordCreateNo == 198) && (row != range.Rows.Count))
-                                            {
-                                                json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
-                                                json += "]";
-                                                json += "}";
+                                //        json += "},";
 
-                                                requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                                                responseCreate = Client.SendAsync(requestCreate).Result;
-                                                result = responseCreate.Content.ReadAsStringAsync().Result;
+                                //        if (yearRow == 3)
+                                //        {
+                                //            if ((multipleRecordCreateNo == 198) && (row != range.Rows.Count))
+                                //            {
+                                //                json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                                //                json += "]";
+                                //                json += "}";
 
-                                                doc = XDocument.Parse(result);
-                                                if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
-                                                {
-                                                    ImportFailed(doc);
-                                                    return View("Error");
-                                                }
+                                //                requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                                //                responseCreate = Client.SendAsync(requestCreate).Result;
+                                //                result = responseCreate.Content.ReadAsStringAsync().Result;
 
-                                                requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
-                                                requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
-                                                requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-                                                json = "{";
-                                                json += "\"records\" :[";
-                                                RecordCreated += multipleRecordCreateNo;
-                                                multipleRecordCreateNo = 0;
-                                            }
-                                        }
-                                    }
-                                }
+                                //                doc = XDocument.Parse(result);
+                                //                if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                                //                {
+                                //                    ImportFailed(doc);
+                                //                    return View("Error");
+                                //                }
+
+                                //                requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                                //                requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                                //                requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                                //                json = "{";
+                                //                json += "\"records\" :[";
+                                //                RecordCreated += multipleRecordCreateNo;
+                                //                multipleRecordCreateNo = 0;
+                                //            }
+                                //        }
+                                //    }
+                                //}
                             }
 
                         }
-                        else if (supplierNO == 18)
+                        else 
+                        if (supplierNO == 18)
                         {
                             if (isElectricityTariffPrice)
                             {
@@ -2926,7 +2948,7 @@ namespace ImportDataFromExcel.Controllers
                             else
                             {
                                 //An unhandled exception of type 'System.StackOverflowException' occurred in mscorlib.dll
-                                string eon = SupplierNO18(multipleRecordCreateNo, json, range, methods, gasTariffId, requestCreate, responseCreate, uri);
+                                string eon = SupplierNO18(ref multipleRecordCreateNo, ref json, ref range, ref methods, ref gasTariffId, ref requestCreate, ref responseCreate, ref uri);
                                 if (eon.Equals("error"))
                                     return View("Error");
                                 else
@@ -2936,69 +2958,69 @@ namespace ImportDataFromExcel.Controllers
                                 //for (int row = 3; row <= 4; row++)
                                 ////for (int row = 2; row <= range.Rows.Count; row++)
                                 //{
-                                    //recordCreated++;
-                                    //multipleRecordCreateNo++;
+                                //recordCreated++;
+                                //multipleRecordCreateNo++;
 
-                                    //json += "{";
-                                    //json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
+                                //json += "{";
+                                //json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
 
-                                    //if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
-                                    //{
-                                    //    string ldz = ((Excel.Range)range.Cells[row, 2]).Text;
-                                    //    json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
-                                    //}
-                                    //if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
-                                    //{
-                                    //    gasTariffId = methods.GetGasTariffIdEON(((Excel.Range)range.Cells[row, 11]).Text, ((Excel.Range)range.Cells[row, 50]).Text + "-" + ((Excel.Range)range.Cells[row, 51]).Text);
-                                    //    if (gasTariffId != string.Empty)
-                                    //        json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
-                                    //}
-                                    //if (((Excel.Range)range.Cells[row, 32] != null) && (((Excel.Range)range.Cells[row, 32]).Text != string.Empty))
-                                    //{
-                                    //    json += "    \"Standing_Charge__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 32]).Text) * 100) + "\",";
-                                    //}
-                                    //if (((Excel.Range)range.Cells[row, 36] != null) && (((Excel.Range)range.Cells[row, 36]).Text != string.Empty))
-                                    //{
-                                    //    json += "    \"Unit_Rate__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 36]).Text) * 100) + "\",";
-                                    //}
-                                    //if (((Excel.Range)range.Cells[row, 50] != null) && (((Excel.Range)range.Cells[row, 50]).Text != string.Empty))
-                                    //    json += "    \"Usage_Band_Min__c\" : \"" + Convert.ToDouble(((Excel.Range)range.Cells[row, 50]).Text) + "\",";
-                                    //if (((Excel.Range)range.Cells[row, 51] != null) && (((Excel.Range)range.Cells[row, 51]).Text != string.Empty))
-                                    //    json += "    \"Usage_Band_Max__c\" : \"" + Convert.ToDouble(((Excel.Range)range.Cells[row, 51]).Text) + "\",";
+                                //if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
+                                //{
+                                //    string ldz = ((Excel.Range)range.Cells[row, 2]).Text;
+                                //    json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
+                                //}
+                                //if (((Excel.Range)range.Cells[row, 11] != null) && (((Excel.Range)range.Cells[row, 11]).Text != string.Empty))
+                                //{
+                                //    gasTariffId = methods.GetGasTariffIdEON(((Excel.Range)range.Cells[row, 11]).Text, ((Excel.Range)range.Cells[row, 50]).Text + "-" + ((Excel.Range)range.Cells[row, 51]).Text);
+                                //    if (gasTariffId != string.Empty)
+                                //        json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                                //}
+                                //if (((Excel.Range)range.Cells[row, 32] != null) && (((Excel.Range)range.Cells[row, 32]).Text != string.Empty))
+                                //{
+                                //    json += "    \"Standing_Charge__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 32]).Text) * 100) + "\",";
+                                //}
+                                //if (((Excel.Range)range.Cells[row, 36] != null) && (((Excel.Range)range.Cells[row, 36]).Text != string.Empty))
+                                //{
+                                //    json += "    \"Unit_Rate__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 36]).Text) * 100) + "\",";
+                                //}
+                                //if (((Excel.Range)range.Cells[row, 50] != null) && (((Excel.Range)range.Cells[row, 50]).Text != string.Empty))
+                                //    json += "    \"Usage_Band_Min__c\" : \"" + Convert.ToDouble(((Excel.Range)range.Cells[row, 50]).Text) + "\",";
+                                //if (((Excel.Range)range.Cells[row, 51] != null) && (((Excel.Range)range.Cells[row, 51]).Text != string.Empty))
+                                //    json += "    \"Usage_Band_Max__c\" : \"" + Convert.ToDouble(((Excel.Range)range.Cells[row, 51]).Text) + "\",";
 
-                                    //json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
-                                    ////json += "\"Tariff_Type__c\" : \"1\",";
+                                //json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
+                                ////json += "\"Tariff_Type__c\" : \"1\",";
 
-                                    //if (json.Last() == ',')
-                                    //    json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
+                                //if (json.Last() == ',')
+                                //    json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
 
-                                    //json += "},";
+                                //json += "},";
 
-                                    //if ((multipleRecordCreateNo == 200) && (row != range.Rows.Count))
-                                    //{
-                                    //    json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
-                                    //    json += "]";
-                                    //    json += "}";
+                                //if ((multipleRecordCreateNo == 200) && (row != range.Rows.Count))
+                                //{
+                                //    json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                                //    json += "]";
+                                //    json += "}";
 
-                                    //    requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                                    //    responseCreate = Client.SendAsync(requestCreate).Result;
-                                    //    result = responseCreate.Content.ReadAsStringAsync().Result;
+                                //    requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                                //    responseCreate = Client.SendAsync(requestCreate).Result;
+                                //    result = responseCreate.Content.ReadAsStringAsync().Result;
 
-                                    //    doc = XDocument.Parse(result);
-                                    //    if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
-                                    //    {
-                                    //        ImportFailed(doc);
-                                    //        return View("Error");
-                                    //    }
+                                //    doc = XDocument.Parse(result);
+                                //    if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                                //    {
+                                //        ImportFailed(doc);
+                                //        return View("Error");
+                                //    }
 
-                                    //    requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
-                                    //    requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
-                                    //    requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-                                    //    json = "{";
-                                    //    json += "\"records\" :[";
-                                    //    RecordCreated += multipleRecordCreateNo;
-                                    //    multipleRecordCreateNo = 0;
-                                    //}
+                                //    requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                                //    requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                                //    requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                                //    json = "{";
+                                //    json += "\"records\" :[";
+                                //    RecordCreated += multipleRecordCreateNo;
+                                //    multipleRecordCreateNo = 0;
+                                //}
                                 //}
                             }
                         }
@@ -3160,7 +3182,288 @@ namespace ImportDataFromExcel.Controllers
             Marshal.ReleaseComObject(application);
         }
 
-        public string SupplierNO18(int multipleRecordCreateNo, string json, Excel.Range range, Methods methods, string gasTariffId, HttpRequestMessage requestCreate, HttpResponseMessage responseCreate, string uri)
+        public string SupplierNO15(ref int multipleRecordCreateNo, ref string json, ref Excel.Range range, ref Methods methods, ref string gasTariffId, ref HttpRequestMessage requestCreate, ref HttpResponseMessage responseCreate, ref string uri)
+        {
+            //for (int row = 3; row <= 4; row++)
+            for (int row = 2; row <= range.Rows.Count; row++)
+            {
+                if (((Excel.Range)range.Cells[row, 7] == null) || (((Excel.Range)range.Cells[row, 7]).Text == string.Empty))
+                    continue;
+
+                recordCreated++;
+                multipleRecordCreateNo++;
+
+                json += "{";
+                json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "\"},";
+
+                if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                {
+                    string ldz = ((Excel.Range)range.Cells[row, 1]).Text;
+                    json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
+                }
+                string standingCharge = string.Empty;
+                if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                {
+                    standingCharge = ((Excel.Range)range.Cells[row, 3]).Text;
+                    json += "    \"Standing_Charge__c\" : \"" + (Convert.ToDouble(((Excel.Range)range.Cells[row, 3]).Text) * 100) + "\",";
+                }
+                if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                    json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 4]).Text + "\",";
+                if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                    json += "    \"Usage_Band_Min__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 5]).Text), @"[,]", "") + "\",";
+                if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                    json += "    \"Usage_Band_Max__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 6]).Text), @"[,]", "") + "\",";
+                if (((Excel.Range)range.Cells[row, 7] != null) && (((Excel.Range)range.Cells[row, 7]).Text != string.Empty))
+                {
+                    gasTariffId = methods.GetGasTariffIdCG(((Excel.Range)range.Cells[row, 7]).Text, standingCharge);
+                    if (gasTariffId != string.Empty)
+                        json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                }
+                if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                {
+                    string date = ((Excel.Range)range.Cells[row, 8]).Text;
+                    string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                    if (dateArray[0].Length == 1)
+                        date = "0" + date;
+                    if (dateArray[1].Length == 1)
+                        date = date.Insert(3, "0");
+
+                    json += "\"EarliestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                }
+                if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                {
+                    string date = ((Excel.Range)range.Cells[row, 9]).Text;
+                    string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                    if (dateArray[0].Length == 1)
+                        date = "0" + date;
+                    if (dateArray[1].Length == 1)
+                        date = date.Insert(3, "0");
+
+                    json += "\"LatestContractStartDate__c\" : \"" + (DateTime.ParseExact(date, "MM/dd/yyyy", null)).ToString("yyyy-MM-dd") + "\",";
+                }
+
+                json += "\"Pricing_Start__c\" : \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\",";
+                //json += "\"Tariff_Type__c\" : \"1\",";
+
+                if (json.Last() == ',')
+                    json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
+
+                json += "},";
+
+                if ((multipleRecordCreateNo == 200) && (row != range.Rows.Count))
+                {
+                    json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                    json += "]";
+                    json += "}";
+
+                    requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    responseCreate = Client.SendAsync(requestCreate).Result;
+                    string result = responseCreate.Content.ReadAsStringAsync().Result;
+
+                    XDocument doc = XDocument.Parse(result);
+                    if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                    {
+                        ImportFailed(doc);
+                        //return View("Error");
+                        return "error";
+                    }
+
+                    requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                    requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                    requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                    json = "{";
+                    json += "\"records\" :[";
+                    RecordCreated += multipleRecordCreateNo;
+                    multipleRecordCreateNo = 0;
+                }
+            }
+
+            return json;
+        }
+
+        public string SupplierNO16_17(ref int multipleRecordCreateNo, ref string json, ref Excel.Range range, ref Methods methods, ref string gasTariffId, ref HttpRequestMessage requestCreate, ref HttpResponseMessage responseCreate, ref string uri, ref int supplierNO)
+        {
+            //for (int row = 3; row <= 4; row++)
+            for (int row = 2; row <= range.Rows.Count; row++)
+            {
+                for (int yearRow = 1; yearRow <= 3; yearRow++)
+                {
+                    if ((yearRow == 1) && (((Excel.Range)range.Cells[row, 4] == null) || (((Excel.Range)range.Cells[row, 4]).Text == string.Empty)))
+                        continue;
+                    else if ((yearRow == 2) && (((Excel.Range)range.Cells[row, 8] == null) || (((Excel.Range)range.Cells[row, 8]).Text == string.Empty)))
+                        continue;
+                    else if ((yearRow == 3) && (((Excel.Range)range.Cells[row, 12] == null) || (((Excel.Range)range.Cells[row, 12]).Text == string.Empty)))
+                        continue;
+
+                    recordCreated++;
+                    multipleRecordCreateNo++;
+
+                    json += "{";
+                    json += "\"attributes\" : {\"type\" : \"" + Object + "\", \"referenceId\" : \"Row " + row + "_" + yearRow + "\"},";
+
+                    if (((Excel.Range)range.Cells[row, 1] != null) && (((Excel.Range)range.Cells[row, 1]).Text != string.Empty))
+                        json += "    \"Usage_Band_Min__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 1]).Text), @"[,]", "") + "\",";
+                    if (((Excel.Range)range.Cells[row, 2] != null) && (((Excel.Range)range.Cells[row, 2]).Text != string.Empty))
+                        json += "    \"Usage_Band_Max__c\" : \"" + Regex.Replace((((Excel.Range)range.Cells[row, 2]).Text), @"[,]", "") + "\",";
+                    if (((Excel.Range)range.Cells[row, 3] != null) && (((Excel.Range)range.Cells[row, 3]).Text != string.Empty))
+                    {
+                        string ldz = ((Excel.Range)range.Cells[row, 3]).Text;
+                        json += "\"PES_Area__c\" : \"" + methods.GetLDZ_ID(ldz) + "\",";
+                    }
+
+                    if (yearRow == 1)
+                    {
+                        if (((Excel.Range)range.Cells[row, 4] != null) && (((Excel.Range)range.Cells[row, 4]).Text != string.Empty))
+                        {
+                            if (supplierNO == 16)
+                                gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 4]).Text);
+                            else
+                                gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 4]).Text);
+
+                            if (gasTariffId != string.Empty)
+                                json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                        }
+                        if (((Excel.Range)range.Cells[row, 5] != null) && (((Excel.Range)range.Cells[row, 5]).Text != string.Empty))
+                            json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 5]).Text + "\",";
+                        if (((Excel.Range)range.Cells[row, 6] != null) && (((Excel.Range)range.Cells[row, 6]).Text != string.Empty))
+                            json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 6]).Text + "\",";
+                    }
+                    else if (yearRow == 2)
+                    {
+                        if (((Excel.Range)range.Cells[row, 8] != null) && (((Excel.Range)range.Cells[row, 8]).Text != string.Empty))
+                        {
+                            if (supplierNO == 15)
+                                gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 8]).Text);
+                            else
+                                gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 8]).Text);
+
+                            if (gasTariffId != string.Empty)
+                                json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                        }
+                        if (((Excel.Range)range.Cells[row, 9] != null) && (((Excel.Range)range.Cells[row, 9]).Text != string.Empty))
+                            json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 9]).Text + "\",";
+                        if (((Excel.Range)range.Cells[row, 10] != null) && (((Excel.Range)range.Cells[row, 10]).Text != string.Empty))
+                            json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 10]).Text + "\",";
+                    }
+                    else if (yearRow == 3)
+                    {
+                        if (((Excel.Range)range.Cells[row, 12] != null) && (((Excel.Range)range.Cells[row, 12]).Text != string.Empty))
+                        {
+                            if (supplierNO == 15)
+                                gasTariffId = methods.GetGasTariffIdDG_REN(((Excel.Range)range.Cells[row, 12]).Text);
+                            else
+                                gasTariffId = methods.GetGasTariffIdDG_ACQ(((Excel.Range)range.Cells[row, 12]).Text);
+
+                            if (gasTariffId != string.Empty)
+                                json += "\"Gas_Tariff__c\" : \"" + gasTariffId + "\",";
+                        }
+                        if (((Excel.Range)range.Cells[row, 13] != null) && (((Excel.Range)range.Cells[row, 13]).Text != string.Empty))
+                            json += "    \"Standing_Charge__c\" : \"" + ((Excel.Range)range.Cells[row, 13]).Text + "\",";
+                        if (((Excel.Range)range.Cells[row, 14] != null) && (((Excel.Range)range.Cells[row, 14]).Text != string.Empty))
+                            json += "    \"Unit_Rate__c\" : \"" + ((Excel.Range)range.Cells[row, 14]).Text + "\",";
+                    }
+
+                    if (((Excel.Range)range.Cells[row, 16] != null) && (((Excel.Range)range.Cells[row, 16]).Text != string.Empty))
+                    {
+                        string date = ((Excel.Range)range.Cells[row, 16]).Text;
+                        string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                        if (dateArray[0].Length == 1)
+                            date = "0" + date;
+                        if (dateArray[1].Length == 1)
+                            date = date.Insert(3, "0");
+
+                        //string logPath = @"C:/Users/Renis Kraja/Desktop/Salesforce/ImportDataFromExcel/Logs/Log.txt";
+
+                        //if (!System.IO.File.Exists(logPath))
+                        //{
+                        //    System.IO.File.Create(logPath);
+                        //    TextWriter tw = new StreamWriter(logPath);
+                        //    tw.WriteLine("date - " + date);
+                        //    tw.WriteLine();
+                        //    tw.Close();
+                        //}
+                        //else if (System.IO.File.Exists(logPath))
+                        //{
+                        //    string str;
+                        //    using (StreamReader sreader = new StreamReader(logPath))
+                        //    {
+                        //        str = sreader.ReadToEnd();
+                        //    }
+
+                        //    System.IO.File.Delete(logPath);
+
+                        //    using (StreamWriter tw = new StreamWriter(logPath, false))
+                        //    {
+                        //        tw.WriteLine("date - " + date);
+                        //        tw.WriteLine();
+                        //        tw.Write(str);
+                        //    }
+                        //}
+
+
+                        DateTime parsedDate = DateTime.Parse(date);
+                        //DateTime parsedDate = DateTime.ParseExact(date, "MM/dd/yyyy", null);
+                        json += "\"EarliestContractStartDate__c\" : \"" + parsedDate.ToString("yyyy-MM-dd") + "\",";
+                    }
+                    if (((Excel.Range)range.Cells[row, 17] != null) && (((Excel.Range)range.Cells[row, 17]).Text != string.Empty))
+                    {
+                        string date = ((Excel.Range)range.Cells[row, 17]).Text;
+                        string[] dateArray = date.Split(new string[] { "/" }, 3, StringSplitOptions.None);
+                        if (dateArray[0].Length == 1)
+                            date = "0" + date;
+                        if (dateArray[1].Length == 1)
+                            date = date.Insert(3, "0");
+
+                        //DateTime parsedDate = DateTime.ParseExact(date, "MM/dd/yyyy", null);
+
+                        //json += "\"LatestContractStartDate__c\" : \"" + (parsedDate).ToString("yyyy-MM-dd") + "\",";
+                    }
+
+                    DateTime now = DateTime.Now;
+                    json += "\"Pricing_Start__c\" : \"" + now.ToString("yyyy-MM-dd") + "\",";
+                    //json += "\"Tariff_Type__c\" : \"1\",";
+
+                    if (json.Last() == ',')
+                        json = json.Remove(json.Length - 1, 1); // Remove the last "," if the last cell of the Excel file is empty
+
+                    json += "},";
+
+                    if (yearRow == 3)
+                    {
+                        if ((multipleRecordCreateNo == 198) && (row != range.Rows.Count))
+                        {
+                            json = json.Remove(json.Length - 1, 1); // Remove "," from the last record added to the json
+                            json += "]";
+                            json += "}";
+
+                            requestCreate.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                            responseCreate = Client.SendAsync(requestCreate).Result;
+                            string result = responseCreate.Content.ReadAsStringAsync().Result;
+
+                            XDocument doc = XDocument.Parse(result);
+                            if (doc.Descendants("SObjectTreeResponse").ElementAt(0).Descendants("hasErrors").ElementAt(0).Value.Equals("true"))
+                            {
+                                ImportFailed(doc);
+                                //return View("Error");
+                                return "error";
+                            }
+
+                            requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+                            requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+                            requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                            json = "{";
+                            json += "\"records\" :[";
+                            RecordCreated += multipleRecordCreateNo;
+                            multipleRecordCreateNo = 0;
+                        }
+                    }
+                }
+            }
+
+            return json;
+        }
+
+        public string SupplierNO18(ref int multipleRecordCreateNo, ref string json, ref Excel.Range range, ref Methods methods, ref string gasTariffId, ref HttpRequestMessage requestCreate, ref HttpResponseMessage responseCreate, ref string uri)
         {
             //for (int row = 2; row <= 10; row++)
             for (int row = 2; row <= range.Rows.Count; row++)
