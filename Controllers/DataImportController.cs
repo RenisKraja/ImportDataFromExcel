@@ -1273,7 +1273,7 @@ namespace ImportDataFromExcel.Controllers
                                                 &&
                                                 (((Excel.Range)range.Cells[row, 11]).Text != string.Empty)
                                                 &&
-                                                (!((((Excel.Range)range.Cells[row, 11]).Text == "0") || (((Excel.Range)range.Cells[row, 11]).Text != "0.0")))
+                                                (!((((Excel.Range)range.Cells[row, 11]).Text == "0") || (((Excel.Range)range.Cells[row, 11]).Text == "0.0")))
                                                )
                                             {
                                                 continue;
@@ -3136,36 +3136,36 @@ namespace ImportDataFromExcel.Controllers
             }
             catch (Exception ex)
             {
-                //DateTime now = DateTime.Now;
-                //string logPath = @"C:/Users/Renis Kraja/Desktop/Salesforce/ImportDataFromExcel/Logs/Log.txt";
+                DateTime now = DateTime.Now;
+                string logPath = @""+WebConfigurationManager.AppSettings["logPath"]; ;
 
-                //if (!System.IO.File.Exists(logPath))
-                //{
-                //    System.IO.File.Create(logPath);
-                //    TextWriter tw = new StreamWriter(logPath);
-                //    tw.WriteLine("Log - " + now);
-                //    tw.WriteLine(ex);
-                //    tw.WriteLine();
-                //    tw.Close();
-                //}
-                //else if (System.IO.File.Exists(logPath))
-                //{
-                //    string str;
-                //    using (StreamReader sreader = new StreamReader(logPath))
-                //    {
-                //        str = sreader.ReadToEnd();
-                //    }
+                if (!System.IO.File.Exists(logPath))
+                {
+                    System.IO.File.Create(logPath);
+                    TextWriter tw = new StreamWriter(logPath);
+                    tw.WriteLine("Log - " + now);
+                    tw.WriteLine(ex);
+                    tw.WriteLine();
+                    tw.Close();
+                }
+                else if (System.IO.File.Exists(logPath))
+                {
+                    string str;
+                    using (StreamReader sreader = new StreamReader(logPath))
+                    {
+                        str = sreader.ReadToEnd();
+                    }
 
-                //    System.IO.File.Delete(logPath);
+                    System.IO.File.Delete(logPath);
 
-                //    using (StreamWriter tw = new StreamWriter(logPath, false))
-                //    {
-                //        tw.WriteLine("Log - " + now);
-                //        tw.WriteLine(ex);
-                //        tw.WriteLine();
-                //        tw.Write(str);
-                //    }
-                //}
+                    using (StreamWriter tw = new StreamWriter(logPath, false))
+                    {
+                        tw.WriteLine("Log - " + now);
+                        tw.WriteLine(ex);
+                        tw.WriteLine();
+                        tw.Write(str);
+                    }
+                }
 
                 throw ex;
             }
