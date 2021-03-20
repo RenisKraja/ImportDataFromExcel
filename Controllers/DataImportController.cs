@@ -18,6 +18,7 @@ using System.Web.Http.Routing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Reflection;
 
 namespace ImportDataFromExcel.Controllers
 {
@@ -48,7 +49,7 @@ namespace ImportDataFromExcel.Controllers
             new { ID = "1", Name = "British Gas Lite" },
             new { ID = "2", Name = "British Gas REN" },
             new { ID = "3", Name = "British Gas ACQ" },
-            new { ID = "4", Name = "Smartest Energy Electric" },
+            new { ID = "4", Name = "Smartest Energy" },
             new { ID = "5", Name = "Valda Electricity" },
             new { ID = "6", Name = "EDF" },
             new { ID = "7", Name = "Gazprom REN" },
@@ -1251,7 +1252,7 @@ namespace ImportDataFromExcel.Controllers
                                 {
                                     if (isElectricityTariffPrice)
                                     {
-                                        //for (int row = 3; row <= 61; row++)
+                                        //for (int row = 3; row <= 10; row++)
                                         for (int row = 2; row <= range.Rows.Count; row++)
                                         {
                                             if (((Excel.Range)range.Cells[row, 5] == null) || (((Excel.Range)range.Cells[row, 5]).Text == string.Empty))
@@ -3118,7 +3119,12 @@ namespace ImportDataFromExcel.Controllers
                             return View("Error");
                         }
 
-                        CloseExcelFile();
+                        //CloseExcelFile();
+                        workBook.Close(true, Missing.Value, Missing.Value);
+                        application.Quit();
+                        Marshal.ReleaseComObject(workSheet);
+                        Marshal.ReleaseComObject(workBook);
+                        Marshal.ReleaseComObject(application);
 
                         Status = "Completed";
                         RecordCreated = recordCreated;
@@ -3167,6 +3173,27 @@ namespace ImportDataFromExcel.Controllers
                     }
                 }
 
+                Status = "Failed";
+                RecordFailed = 1;
+                MessageError = ex.ToString();
+
+                ProcessingTime = (DateTime.Now - StartDate).TotalSeconds;
+
+                Results results = new Results();
+                results.Status = Status;
+                results.Object = Object;
+                results.RecordCreated = RecordCreated.ToString();
+                results.RecordFailed = RecordFailed.ToString();
+                results.StartDate = StartDate.ToString();
+                results.ProcessingTime = (Math.Round(ProcessingTime, 2)).ToString();
+                results.MessageError = MessageError;
+                results.StatusCode = StatusCode;
+                results.ReferenceId = ReferenceId;
+                ViewBag.Results = results;
+
+                // Create Log record after the import ends
+                CreateLog(Client, results);
+
                 throw ex;
             }
         }
@@ -3200,6 +3227,9 @@ namespace ImportDataFromExcel.Controllers
             results.StatusCode = StatusCode;
             results.ReferenceId = ReferenceId;
             ViewBag.Results = results;
+
+            // Create Log record after the import ends
+            CreateLog(Client, results);
         }
 
         public void ObjectDoesNotExist()
@@ -3231,6 +3261,9 @@ namespace ImportDataFromExcel.Controllers
             results.StatusCode = StatusCode;
             results.ReferenceId = ReferenceId;
             ViewBag.Results = results;
+
+            // Create Log record after the import ends
+            CreateLog(Client, results);
         }
 
         public void PopulateOutputTable()
@@ -3248,6 +3281,9 @@ namespace ImportDataFromExcel.Controllers
             results.StatusCode = StatusCode;
             results.ReferenceId = ReferenceId;
             ViewBag.Results = results;
+
+            // Create Log record after the import ends
+            CreateLog(Client, results);
         }
 
         public void CloseExcelFile()
@@ -3257,6 +3293,38 @@ namespace ImportDataFromExcel.Controllers
             Marshal.ReleaseComObject(workSheet);
             Marshal.ReleaseComObject(workBook);
             Marshal.ReleaseComObject(application);
+        }
+
+        private string CreateRecord(HttpClient client, string createMessage, string recordType)
+        {
+            HttpContent contentCreate = new StringContent(createMessage, Encoding.UTF8, "application/xml");
+            string uri = $"{ServiceUrl}{ApiEndpoint}sobjects/{recordType}";
+
+            HttpRequestMessage requestCreate = new HttpRequestMessage(HttpMethod.Post, uri);
+            requestCreate.Headers.Add("Authorization", "Bearer " + AuthToken);
+            requestCreate.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            requestCreate.Content = contentCreate;
+
+            HttpResponseMessage response = client.SendAsync(requestCreate).Result;
+            return response.Content.ReadAsStringAsync().Result;
+        }
+
+        private void CreateLog(HttpClient client, Results results)
+        {
+            string createMessage = $"<root>" +
+                $"<Name>{"ImportDataFromExcel - "+results.StartDate.ToString()}</Name>" +
+                $"<Status__c>{results.Status}</Status__c>" +
+                $"<Object__c>{results.Object}</Object__c>" +
+                $"<Record_Created__c>{results.RecordCreated}</Record_Created__c>" +
+                $"<Record_Failed__c>{results.RecordFailed}</Record_Failed__c>" +
+                $"<Start_Date__c>{results.StartDate.ToString()}</Start_Date__c>" +
+                $"<Processing_Time__c>{results.ProcessingTime}</Processing_Time__c>" +
+                $"<Message_Error__c>{results.MessageError}</Message_Error__c>" +
+                $"<Status_Code__c>{results.StatusCode}</Status_Code__c>" +
+                $"<Reference_Id__c>{results.ReferenceId}</Reference_Id__c>" +
+                $"</root>";
+
+            string result = CreateRecord(client, createMessage, "Log__c");
         }
 
         public string SupplierNO15(ref int multipleRecordCreateNo, ref string json, ref Excel.Range range, ref Methods methods, ref string gasTariffId, ref HttpRequestMessage requestCreate, ref HttpResponseMessage responseCreate, ref string uri)
